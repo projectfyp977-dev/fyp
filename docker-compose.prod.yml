@@ -1,0 +1,75 @@
+# Production Docker Compose - Optimized build, no volumes, health checks
+services:
+  mysql:
+    image: mysql:8
+    container_name: voice-cv-mysql-prod
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:-voice_cv_maker}
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+      - ./server/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - voice-cv-net
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    image: voice-cv-server:prod
+    container_name: voice-cv-server-prod
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: mysql
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME:-voice_cv_maker}
+      JWT_SECRET: ${JWT_SECRET}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    volumes:
+      - server_uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - voice-cv-net
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-/api}
+    image: voice-cv-client:prod
+    container_name: voice-cv-client-prod
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - voice-cv-net
+
+volumes:
+  mysql_prod_data:
+  server_uploads:
+
+networks:
+  voice-cv-net:
+    driver: bridge
