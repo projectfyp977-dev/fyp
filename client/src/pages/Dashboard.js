@@ -174,7 +174,7 @@ const Dashboard = () => {
                 boxShadow: 1,
               }}
             >
-              V
+              A
             </Box>
             <Typography 
               variant="h6" 
@@ -186,7 +186,7 @@ const Dashboard = () => {
                 display: { xs: 'none', sm: 'block' }
               }}
             >
-              Voice CV Maker
+              ATS CV Builder
             </Typography>
           </Box>
           
@@ -233,7 +233,7 @@ const Dashboard = () => {
             My CVs
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 560 }}>
-            Create and manage your professional CVs with voice input and AI assistance
+            Create, optimize, and download ATS-friendly CVs with built-in scoring and AI suggestions.
           </Typography>
         </Box>
 

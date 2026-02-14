@@ -34,6 +34,7 @@ import axios from 'axios';
 import VoiceInput from '../components/VoiceInput';
 import AISuggestions from '../components/AISuggestions';
 import ATSScoreChecker from '../components/ATSScoreChecker';
+import CoverLetterGenerator from '../components/CoverLetterGenerator';
 import CVTemplateSelector from '../components/CVTemplateSelector';
 import CVPreview from '../components/CVPreview';
 import CVCustomization from '../components/CVCustomization';
@@ -48,7 +49,7 @@ const CVEditor = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(!!id);
   const [saving, setSaving] = useState(false);
-  const [template, setTemplate] = useState('modern');
+  const [template, setTemplate] = useState('ats-simple');
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [customization, setCustomization] = useState({
@@ -84,7 +85,7 @@ const CVEditor = () => {
   });
   const [cv, setCv] = useState({
     title: 'My CV',
-    template: 'modern',
+    template: 'ats-simple',
     customization: {
       fontFamily: 'Inter',
       fontSize: 14,
@@ -825,6 +826,169 @@ const CVEditor = () => {
 
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6">Certifications</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {cv.certifications?.map((cert, index) => (
+                    <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                      <Box display="flex" justifyContent="space-between" mb={2}>
+                        <Typography variant="subtitle1">Certification {index + 1}</Typography>
+                        <Button size="small" color="error" onClick={() => removeItem('certifications', index)}>
+                          Remove
+                        </Button>
+                      </Box>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <VoiceInput
+                            label="Certification Name"
+                            value={cert.name || ''}
+                            onChange={(value) => updateItem('certifications', index, 'name', value)}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <VoiceInput
+                            label="Issuing Organization"
+                            value={cert.issuer || ''}
+                            onChange={(value) => updateItem('certifications', index, 'issuer', value)}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <DatePicker
+                            label="Date Received"
+                            value={formatDate(cert.date)}
+                            onChange={(newValue) => {
+                              const dateStr = formatDateString(newValue);
+                              updateItem('certifications', index, 'date', dateStr);
+                            }}
+                            renderInput={(params) => <TextField {...params} fullWidth variant="outlined" />}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <DatePicker
+                            label="Expiry Date (Optional)"
+                            value={formatDate(cert.expiryDate)}
+                            onChange={(newValue) => {
+                              const dateStr = formatDateString(newValue);
+                              updateItem('certifications', index, 'expiryDate', dateStr);
+                            }}
+                            renderInput={(params) => <TextField {...params} fullWidth variant="outlined" />}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  ))}
+                  <Button startIcon={<AddIcon />} onClick={() => addItem('certifications')}>
+                    Add Certification
+                  </Button>
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6">Languages</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {cv.languages?.map((lang, index) => (
+                    <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                      <Box display="flex" justifyContent="space-between" mb={2}>
+                        <Typography variant="subtitle1">Language {index + 1}</Typography>
+                        <Button size="small" color="error" onClick={() => removeItem('languages', index)}>
+                          Remove
+                        </Button>
+                      </Box>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <VoiceInput
+                            label="Language"
+                            value={lang.language || ''}
+                            onChange={(value) => updateItem('languages', index, 'language', value)}
+                            placeholder="e.g., English, Urdu, Spanish"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <FormControl fullWidth>
+                            <InputLabel>Proficiency Level</InputLabel>
+                            <Select
+                              value={lang.proficiency || 'intermediate'}
+                              onChange={(e) => updateItem('languages', index, 'proficiency', e.target.value)}
+                              label="Proficiency Level"
+                            >
+                              <MenuItem value="beginner">Beginner</MenuItem>
+                              <MenuItem value="intermediate">Intermediate</MenuItem>
+                              <MenuItem value="advanced">Advanced</MenuItem>
+                              <MenuItem value="native">Native</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  ))}
+                  <Button startIcon={<AddIcon />} onClick={() => addItem('languages')}>
+                    Add Language
+                  </Button>
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6">Projects</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {cv.projects?.map((project, index) => (
+                    <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                      <Box display="flex" justifyContent="space-between" mb={2}>
+                        <Typography variant="subtitle1">Project {index + 1}</Typography>
+                        <Button size="small" color="error" onClick={() => removeItem('projects', index)}>
+                          Remove
+                        </Button>
+                      </Box>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <VoiceInput
+                            label="Project Name"
+                            value={project.name || ''}
+                            onChange={(value) => updateItem('projects', index, 'name', value)}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <VoiceInput
+                            label="Description"
+                            value={project.description || ''}
+                            onChange={(value) => updateItem('projects', index, 'description', value)}
+                            multiline
+                            rows={3}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <VoiceInput
+                            label="Technologies (comma separated)"
+                            value={Array.isArray(project.technologies) ? project.technologies.join(', ') : (project.technologies || '')}
+                            onChange={(value) => {
+                              const techArray = value.split(',').map(t => t.trim()).filter(t => t);
+                              updateItem('projects', index, 'technologies', techArray);
+                            }}
+                            placeholder="e.g., React, Node.js, MongoDB"
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <VoiceInput
+                            label="Project Link (Optional)"
+                            value={project.link || ''}
+                            onChange={(value) => updateItem('projects', index, 'link', value)}
+                            placeholder="e.g., https://github.com/username/project"
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  ))}
+                  <Button startIcon={<AddIcon />} onClick={() => addItem('projects')}>
+                    Add Project
+                  </Button>
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography variant="h6">Hobbies & Interests</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
@@ -990,6 +1154,7 @@ const CVEditor = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <CVCustomization customization={customization} onChange={setCustomization} />
               <ATSScoreChecker cvContent={cv} />
+              <CoverLetterGenerator cvContent={cv} />
               <AISuggestions cvContent={cv} />
             </Box>
           </Grid>

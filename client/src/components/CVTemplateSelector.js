@@ -16,156 +16,81 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const templates = {
+  // Only 3 ATS-focused templates exposed to user
   all: [
     {
-      id: 'modern',
-      name: 'Modern',
-      description: 'Clean and professional design with modern typography',
-      category: 'Professional',
-      color: '#6366f1',
-      preview: 'modern',
+      id: 'ats-simple',
+      name: 'ATS Simple',
+      description: 'Single-column, clean ATS-friendly layout',
+      category: 'ATS',
+      color: '#0f766e',
+      preview: 'ats-simple',
     },
     {
-      id: 'classic',
-      name: 'Classic',
-      description: 'Traditional layout perfect for corporate positions',
-      category: 'Professional',
-      color: '#1e293b',
-      preview: 'classic',
-    },
-    {
-      id: 'creative',
-      name: 'Creative',
-      description: 'Bold design for creative professionals',
-      category: 'Creative',
-      color: '#ec4899',
-      preview: 'creative',
-    },
-    {
-      id: 'minimal',
-      name: 'Minimal',
-      description: 'Simple and elegant minimalist design',
-      category: 'Professional',
-      color: '#64748b',
-      preview: 'minimal',
-    },
-    {
-      id: 'it-professional',
-      name: 'IT Professional',
-      description: 'Perfect for software developers and tech roles',
-      category: 'IT',
-      color: '#3b82f6',
-      preview: 'it',
-    },
-    {
-      id: 'marketing',
-      name: 'Marketing',
-      description: 'Eye-catching design for marketing professionals',
-      category: 'Marketing',
-      color: '#f59e0b',
-      preview: 'marketing',
-    },
-    {
-      id: 'designer',
-      name: 'Designer',
-      description: 'Creative layout for designers and artists',
-      category: 'Creative',
-      color: '#8b5cf6',
-      preview: 'designer',
-    },
-    {
-      id: 'student',
-      name: 'Student',
-      description: 'Perfect for freshers and students',
-      category: 'Student',
-      color: '#10b981',
-      preview: 'student',
-    },
-    {
-      id: 'manager',
-      name: 'Manager',
-      description: 'Executive style for managers and leaders',
-      category: 'Professional',
-      color: '#ef4444',
-      preview: 'manager',
-    },
-    {
-      id: 'ats-friendly',
-      name: 'ATS Friendly',
-      description: 'Optimized for Applicant Tracking Systems',
-      category: 'Professional',
-      color: '#06b6d4',
-      preview: 'ats',
-    },
-    {
-      id: 'two-column',
-      name: 'Two Column',
-      description: 'Sidebar layout with better space utilization',
-      category: 'Professional',
-      color: '#6366f1',
-      preview: 'twocolumn',
-    },
-    {
-      id: 'colorful',
-      name: 'Colorful',
-      description: 'Vibrant design with color accents',
-      category: 'Creative',
-      color: '#f97316',
-      preview: 'colorful',
-    },
-    {
-      id: 'elegant',
-      name: 'Elegant',
-      description: 'Sophisticated design for senior professionals',
-      category: 'Professional',
-      color: '#6b7280',
-      preview: 'elegant',
-    },
-    {
-      id: 'bold',
-      name: 'Bold',
-      description: 'Strong visual impact for standout applications',
-      category: 'Creative',
-      color: '#dc2626',
-      preview: 'bold',
-    },
-    {
-      id: 'academic',
-      name: 'Academic',
-      description: 'Formal layout for academic and research positions',
-      category: 'Student',
-      color: '#1e40af',
-      preview: 'academic',
-    },
-    {
-      id: 'sidebar-left',
-      name: 'Sidebar Left',
-      description: 'Professional layout with left sidebar for contact & skills',
-      category: 'Professional',
+      id: 'ats-sidebar',
+      name: 'ATS Sidebar',
+      description: 'Left sidebar for contact & skills, ATS-safe structure',
+      category: 'ATS',
       color: '#2563eb',
-      preview: 'sidebar',
+      preview: 'ats-sidebar',
     },
     {
-      id: 'centered-clean',
-      name: 'Centered Clean',
-      description: 'Minimal centered design with elegant spacing',
-      category: 'Professional',
-      color: '#1e293b',
-      preview: 'centered',
-    },
-    {
-      id: 'card-based',
-      name: 'Card Based',
-      description: 'Modern card-based sections with shadows',
-      category: 'Modern',
-      color: '#8b5cf6',
-      preview: 'card',
+      id: 'ats-card',
+      name: 'ATS Card',
+      description: 'Section cards with clear headings for ATS parsing',
+      category: 'ATS',
+      color: '#7c3aed',
+      preview: 'ats-card',
     },
   ],
 };
 
 const TemplatePreview = ({ template }) => {
   const previews = {
+    'ats-simple': (
+      <Box sx={{ p: 2, bgcolor: '#0f766e', borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box sx={{ width: '80%', height: 10, bgcolor: 'white', borderRadius: 1, mx: 'auto', mb: 1 }} />
+        <Box sx={{ width: '100%', height: 2, bgcolor: 'rgba(255,255,255,0.7)', mb: 1 }} />
+        <Box sx={{ width: '100%', height: 4, bgcolor: 'rgba(255,255,255,0.9)', mb: 0.5 }} />
+        <Box sx={{ width: '100%', height: 4, bgcolor: 'rgba(255,255,255,0.9)', mb: 0.5 }} />
+        <Box sx={{ width: '100%', height: 4, bgcolor: 'rgba(255,255,255,0.9)' }} />
+      </Box>
+    ),
+    'ats-sidebar': (
+      <Box sx={{ p: 1, bgcolor: '#2563eb', borderRadius: 2, height: '100%', display: 'flex', gap: 0.75 }}>
+        <Box sx={{ flex: '0 0 32%', bgcolor: 'rgba(15,23,42,0.5)', borderRadius: 1, p: 1 }}>
+          <Box sx={{ width: '80%', height: 6, bgcolor: 'white', borderRadius: 1, mb: 1, mx: 'auto' }} />
+          <Box sx={{ width: '90%', height: 3, bgcolor: 'rgba(148,163,184,0.9)', borderRadius: 1, mb: 0.5, mx: 'auto' }} />
+          <Box sx={{ width: '90%', height: 2, bgcolor: 'rgba(148,163,184,0.7)', borderRadius: 1, mb: 0.25, mx: 'auto' }} />
+          <Box sx={{ width: '90%', height: 2, bgcolor: 'rgba(148,163,184,0.7)', borderRadius: 1, mb: 0.25, mx: 'auto' }} />
+        </Box>
+        <Box sx={{ flex: 1, bgcolor: 'white', borderRadius: 1, p: 1.25 }}>
+          <Box sx={{ width: '70%', height: 4, bgcolor: '#2563eb', borderRadius: 1, mb: 0.75 }} />
+          <Box sx={{ width: '100%', height: 3, bgcolor: '#e5e7eb', borderRadius: 1, mb: 0.25 }} />
+          <Box sx={{ width: '95%', height: 3, bgcolor: '#e5e7eb', borderRadius: 1, mb: 0.25 }} />
+          <Box sx={{ width: '90%', height: 3, bgcolor: '#e5e7eb', borderRadius: 1 }} />
+        </Box>
+      </Box>
+    ),
+    'ats-card': (
+      <Box sx={{ p: 1.5, bgcolor: '#f8fafc', borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box sx={{ bgcolor: '#7c3aed', borderRadius: 1.5, p: 1.25 }}>
+          <Box sx={{ width: '60%', height: 6, bgcolor: 'white', borderRadius: 1, mb: 0.5 }} />
+          <Box sx={{ width: '40%', height: 3, bgcolor: 'rgba(255,255,255,0.8)', borderRadius: 1 }} />
+        </Box>
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0.75 }}>
+          <Box sx={{ bgcolor: 'white', borderRadius: 1, p: 0.75 }}>
+            <Box sx={{ width: '80%', height: 3, bgcolor: '#e5e7eb', borderRadius: 1, mb: 0.25 }} />
+            <Box sx={{ width: '70%', height: 3, bgcolor: '#e5e7eb', borderRadius: 1 }} />
+          </Box>
+          <Box sx={{ bgcolor: 'white', borderRadius: 1, p: 0.75 }}>
+            <Box sx={{ width: '80%', height: 3, bgcolor: '#e5e7eb', borderRadius: 1, mb: 0.25 }} />
+            <Box sx={{ width: '70%', height: 3, bgcolor: '#e5e7eb', borderRadius: 1 }} />
+          </Box>
+        </Box>
+      </Box>
+    ),
+    // Fallback (not really used now, but keeps default safe)
     modern: (
       <Box sx={{ p: 2, bgcolor: template.color, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
         <Box sx={{ width: '100%', height: 12, bgcolor: 'white', borderRadius: 1 }} />
@@ -352,11 +277,12 @@ const TemplatePreview = ({ template }) => {
 const CVTemplateSelector = ({ open, onClose, onSelect, selectedTemplate }) => {
   const [category, setCategory] = React.useState('all');
 
-  const categories = ['all', 'Professional', 'IT', 'Creative', 'Marketing', 'Student', 'Modern'];
+  // Only one category (ATS) for now
+  const categories = ['all', 'ATS'];
 
-  const filteredTemplates = category === 'all' 
-    ? templates.all 
-    : templates.all.filter(t => t.category === category);
+  const filteredTemplates = category === 'all'
+    ? templates.all
+    : templates.all.filter(t => t.category === 'ATS');
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>

@@ -14,6 +14,8 @@ client/build
 # Misc
 .DS_Store
 .env
+server/.env
+client/.env
 .env.local
 .env.development.local
 .env.test.local
@@ -39,3 +41,6 @@ Thumbs.db
 extract_doc.ps1
 project_content.txt
 
+# Uploads (audio files)
+server/uploads/
+uploads/

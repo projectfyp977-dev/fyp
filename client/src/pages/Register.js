@@ -10,7 +10,6 @@ import {
   Alert,
   Grid,
 } from '@mui/material';
-import MicIcon from '@mui/icons-material/Mic';
 import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
@@ -57,27 +56,11 @@ const Register = () => {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Box sx={{ textAlign: 'center', mb: 3, color: 'white' }}>
-              <Box
-                sx={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 3,
-                  bgcolor: 'rgba(255,255,255,0.2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mx: 'auto',
-                  mb: 2,
-                  backdropFilter: 'blur(10px)',
-                }}
-              >
-                <MicIcon sx={{ fontSize: 40, color: 'white' }} />
-              </Box>
               <Typography variant="h3" fontWeight={700} gutterBottom>
-                Voice CV Maker
+                ATS CV Builder
               </Typography>
               <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                Start creating your professional CV today
+                Start creating your ATS-ready CV today
               </Typography>
             </Box>
           </Grid>

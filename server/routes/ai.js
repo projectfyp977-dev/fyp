@@ -1,12 +1,20 @@
 const express = require('express');
 const OpenAI = require('openai');
+const Groq = require('groq-sdk');
 const auth = require('../middleware/auth');
+const axios = require('axios');
 
 const router = express.Router();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || ''
 });
+
+// Groq client (used when GROQ_API_KEY is set)
+const groq =
+  process.env.GROQ_API_KEY
+    ? new Groq({ apiKey: process.env.GROQ_API_KEY })
+    : null;
 
 // Analyze CV and provide suggestions
 router.post('/analyze', auth, async (req, res) => {
@@ -208,17 +216,31 @@ Original text: "${text}"
 
 Provide only the improved version without explanations.`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You are a professional CV writer. Improve text to be more impactful and professional." },
-        { role: "user", content: prompt }
-      ],
-      temperature: 0.7,
-      max_tokens: 200
-    });
-
-    const improvedText = completion.choices[0].message.content.trim();
+    // If GROQ configured, prefer it for this endpoint
+    let improvedText = text;
+    if (groq) {
+      const completion = await groq.chat.completions.create({
+        model: "llama3-8b-8192",
+        messages: [
+          { role: "system", content: "You are a professional CV writer. Improve text to be more impactful and professional." },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 200
+      });
+      improvedText = completion.choices[0]?.message?.content?.trim() || text;
+    } else {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: "You are a professional CV writer. Improve text to be more impactful and professional." },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 200
+      });
+      improvedText = completion.choices[0].message.content.trim();
+    }
     res.json({ improvedText });
   } catch (error) {
     console.error('AI Improve text error:', error);
@@ -226,34 +248,476 @@ Provide only the improved version without explanations.`;
   }
 });
 
-// Get job recommendations (mock for now)
-router.get('/job-recommendations', auth, async (req, res) => {
+// Generate cover letter from CV + job details
+router.post('/cover-letter', auth, async (req, res) => {
   try {
-    // This would typically analyze the user's CV and match with job postings
-    // For now, returning mock data
-    const mockJobs = [
-      {
-        id: 1,
-        title: "Software Developer",
-        company: "Tech Corp",
-        location: "Remote",
-        match: "85%",
-        description: "Looking for experienced developers..."
-      },
-      {
-        id: 2,
-        title: "Full Stack Engineer",
-        company: "StartupXYZ",
-        location: "New York, NY",
-        match: "78%",
-        description: "Join our growing team..."
+    const { cvContent, jobTitle, companyName, jobDescription } = req.body;
+
+    if (!cvContent) {
+      return res.status(400).json({ message: 'CV content is required' });
+    }
+
+    if (!process.env.OPENAI_API_KEY && !process.env.GROQ_API_KEY) {
+      return res.status(503).json({
+        message: 'AI service not configured (set OPENAI_API_KEY or GROQ_API_KEY)',
+      });
+    }
+
+    const personalInfo = cvContent.personalInfo || {};
+    const summary = cvContent.professionalSummary || '';
+    const workExp = Array.isArray(cvContent.workExperience) ? cvContent.workExperience : [];
+    const skills = Array.isArray(cvContent.skills) ? cvContent.skills : [];
+
+    const flatSkills = skills
+      .flatMap((s) =>
+        Array.isArray(s.items)
+          ? s.items.map((it) => (typeof it === 'string' ? it : it?.name || '')).filter(Boolean)
+          : []
+      )
+      .join(', ');
+
+    const prompt = `Write a professional, ATS-friendly cover letter.
+
+Candidate:
+- Name: ${personalInfo.fullName || 'Not specified'}
+- Target Job Title: ${personalInfo.jobTitle || jobTitle || 'Not specified'}
+- Email: ${personalInfo.email || 'Not specified'}
+
+Company / Role:
+- Job Title: ${jobTitle || personalInfo.jobTitle || 'Not specified'}
+- Company: ${companyName || 'Not specified'}
+- Job Description: ${jobDescription || 'Not provided'}
+
+CV Summary:
+- Professional Summary: ${summary}
+- Work Experience count: ${workExp.length}
+- Key Skills: ${flatSkills || 'Not specified'}
+
+Instructions:
+- Use a formal, concise tone (no more than 4–6 short paragraphs).
+- Focus on relevant experience, quantified achievements, and matching skills.
+- Avoid generic fluff; be specific and tailored to the job title/company if given.
+- Do NOT include placeholders like [Company] or [Your Name]; use actual data from above.
+- Return only the final cover letter text (no markdown, no bullet lists, no explanation).`;
+
+    let letter = '';
+
+    if (groq) {
+      // Use Groq (llama3) when GROQ_API_KEY is configured
+      const completion = await groq.chat.completions.create({
+        model: "llama3-8b-8192",
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are an expert professional cover letter writer. Always return only the final cover letter text, ready to send.',
+          },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 900,
+      });
+      letter = completion.choices[0]?.message?.content?.trim() || '';
+    } else {
+      // Fallback to OpenAI if GROQ is not configured
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are an expert professional cover letter writer. Always return only the final cover letter text, ready to send.',
+          },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 900,
+      });
+      letter = completion.choices[0].message.content.trim();
+    }
+
+    res.json({
+      coverLetter: letter,
+    });
+  } catch (error) {
+    console.error('Cover letter generation error:', error);
+    res.status(500).json({
+      message: error.message || 'Failed to generate cover letter',
+    });
+  }
+});
+
+// Helper function to extract skills from CV content
+function extractSkillsFromCV(cvContent) {
+  const skills = new Set();
+  
+  // Extract from skills section
+  if (Array.isArray(cvContent.skills)) {
+    cvContent.skills.forEach(skillCategory => {
+      if (skillCategory.items && Array.isArray(skillCategory.items)) {
+        skillCategory.items.forEach(skill => {
+          if (typeof skill === 'string') {
+            skills.add(skill.toLowerCase().trim());
+          }
+        });
       }
+    });
+  }
+  
+  // Extract from professional summary
+  if (cvContent.professionalSummary) {
+    const commonTechSkills = [
+      'javascript', 'python', 'java', 'react', 'node', 'sql', 'mongodb', 'postgresql',
+      'html', 'css', 'typescript', 'angular', 'vue', 'express', 'django', 'flask',
+      'aws', 'docker', 'kubernetes', 'git', 'github', 'agile', 'scrum', 'rest',
+      'api', 'graphql', 'redux', 'next', 'php', 'ruby', 'c++', 'c#', '.net',
+      'machine learning', 'ai', 'data science', 'analytics', 'tableau', 'power bi'
     ];
     
-    res.json(mockJobs);
+    const summaryLower = cvContent.professionalSummary.toLowerCase();
+    commonTechSkills.forEach(skill => {
+      if (summaryLower.includes(skill)) {
+        skills.add(skill);
+      }
+    });
+  }
+  
+  // Extract from work experience
+  if (Array.isArray(cvContent.workExperience)) {
+    cvContent.workExperience.forEach(exp => {
+      const description = (exp.description || '').toLowerCase();
+      const title = (exp.title || '').toLowerCase();
+      
+      const commonTechSkills = [
+        'javascript', 'python', 'java', 'react', 'node', 'sql', 'mongodb', 'postgresql',
+        'html', 'css', 'typescript', 'angular', 'vue', 'express', 'django', 'flask',
+        'aws', 'docker', 'kubernetes', 'git', 'github', 'agile', 'scrum', 'rest',
+        'api', 'graphql', 'redux', 'next', 'php', 'ruby', 'c++', 'c#', '.net',
+        'machine learning', 'ai', 'data science', 'analytics', 'tableau', 'power bi',
+        'project management', 'leadership', 'team management', 'communication'
+      ];
+      
+      commonTechSkills.forEach(skill => {
+        if (description.includes(skill) || title.includes(skill)) {
+          skills.add(skill);
+        }
+      });
+    });
+  }
+  
+  return Array.from(skills);
+}
+
+// Helper function to calculate match score between CV skills and job
+function calculateMatchScore(cvSkills, jobTitle, jobDescription) {
+  const jobText = `${jobTitle} ${jobDescription || ''}`.toLowerCase();
+  let matchCount = 0;
+  
+  cvSkills.forEach(skill => {
+    if (jobText.includes(skill)) {
+      matchCount++;
+    }
+  });
+  
+  if (cvSkills.length === 0) return 0;
+  
+  const matchPercentage = Math.round((matchCount / cvSkills.length) * 100);
+  return Math.min(matchPercentage, 100); // Cap at 100%
+}
+
+// Get job recommendations based on CV
+router.post('/job-recommendations', auth, async (req, res) => {
+  try {
+    const { cvContent, location = '', jobTitle = '' } = req.body;
+    
+    if (!cvContent) {
+      return res.status(400).json({ message: 'CV content is required' });
+    }
+    
+    // Extract skills from CV
+    const cvSkills = extractSkillsFromCV(cvContent);
+    
+    let jobs = [];
+    let totalFound = 0;
+    
+    // Try to fetch real jobs from Adzuna API (free tier)
+    if (process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY) {
+      try {
+        const searchQuery = jobTitle || cvContent.personalInfo?.jobTitle || 'developer';
+        const searchLocation = location || 'us';
+        
+        const adzunaResponse = await axios.get('https://api.adzuna.com/v1/api/jobs/us/search/1', {
+          params: {
+            app_id: process.env.ADZUNA_APP_ID,
+            app_key: process.env.ADZUNA_APP_KEY,
+            results_per_page: 20,
+            what: searchQuery,
+            where: searchLocation,
+            content_type: 'application/json'
+          },
+          timeout: 10000
+        });
+        
+        if (adzunaResponse.data && adzunaResponse.data.results) {
+          jobs = adzunaResponse.data.results.map((job, index) => ({
+            id: job.id || index,
+            title: job.title || 'Job Title Not Available',
+            company: job.company?.display_name || 'Company Not Specified',
+            location: job.location?.display_name || location || 'Location Not Specified',
+            description: job.description || '',
+            url: job.redirect_url || '',
+            salaryMin: job.salary_min,
+            salaryMax: job.salary_max,
+            salaryCurrency: job.salary_is_predicted ? 'USD' : (job.salary_min ? 'USD' : null),
+            created: job.created,
+            match: `${calculateMatchScore(cvSkills, job.title || '', job.description || '')}%`
+          }));
+          
+          totalFound = adzunaResponse.data.count || jobs.length;
+        }
+      } catch (adzunaError) {
+        console.error('Adzuna API error:', adzunaError.message);
+        // Fall through to GPT fallback
+      }
+    }
+    
+    // If no jobs from Adzuna, use GPT to generate recommendations
+    if (jobs.length === 0 && process.env.OPENAI_API_KEY) {
+      try {
+        const prompt = `Based on this CV, suggest 10 real job opportunities that would be a good match. 
+        
+CV Skills: ${cvSkills.join(', ') || 'Not specified'}
+Job Title Preference: ${jobTitle || cvContent.personalInfo?.jobTitle || 'Not specified'}
+Location Preference: ${location || 'Not specified'}
+
+Return ONLY a JSON array of job objects with this exact structure (no markdown, no code blocks):
+[
+  {
+    "title": "Job Title",
+    "company": "Company Name",
+    "location": "City, State/Country",
+    "description": "Brief job description",
+    "match": "85%",
+    "url": "https://example.com/job"
+  }
+]`;
+
+        const completion = await openai.chat.completions.create({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are a job matching expert. Return ONLY valid JSON array, no markdown, no explanations." },
+            { role: "user", content: prompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 2000,
+          response_format: { type: "json_object" }
+        });
+        
+        let gptJobs = [];
+        try {
+          const content = completion.choices[0].message.content.trim();
+          let jsonString = content;
+          
+          // Handle if wrapped in markdown
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/);
+          if (jsonMatch) {
+            jsonString = jsonMatch[1].trim();
+          }
+          
+          // Try to parse as object first (if GPT returns {jobs: [...]})
+          const parsed = JSON.parse(jsonString);
+          if (Array.isArray(parsed)) {
+            gptJobs = parsed;
+          } else if (parsed.jobs && Array.isArray(parsed.jobs)) {
+            gptJobs = parsed.jobs;
+          } else if (parsed.recommendations && Array.isArray(parsed.recommendations)) {
+            gptJobs = parsed.recommendations;
+          }
+          
+          // Calculate match scores for GPT jobs
+          gptJobs = gptJobs.map((job, index) => ({
+            id: job.id || `gpt-${index}`,
+            title: job.title || 'Job Title Not Available',
+            company: job.company || 'Company Not Specified',
+            location: job.location || location || 'Location Not Specified',
+            description: job.description || '',
+            url: job.url || '',
+            match: job.match || `${calculateMatchScore(cvSkills, job.title || '', job.description || '')}%`
+          }));
+          
+          jobs = gptJobs;
+          totalFound = jobs.length;
+        } catch (parseError) {
+          console.error('Error parsing GPT job recommendations:', parseError);
+        }
+      } catch (gptError) {
+        console.error('GPT job recommendations error:', gptError);
+      }
+    }
+    
+    // Sort jobs by match score (highest first)
+    jobs.sort((a, b) => {
+      const scoreA = parseInt(a.match) || 0;
+      const scoreB = parseInt(b.match) || 0;
+      return scoreB - scoreA;
+    });
+    
+    // Skills gap analysis - identify missing skills from top matching jobs
+    const skillsGap = [];
+    if (jobs.length > 0 && cvSkills.length > 0) {
+      const topJobs = jobs.slice(0, 5); // Analyze top 5 jobs
+      const requiredSkills = new Set();
+      
+      topJobs.forEach(job => {
+        const jobText = `${job.title} ${job.description}`.toLowerCase();
+        const commonTechSkills = [
+          'javascript', 'python', 'java', 'react', 'node', 'sql', 'mongodb', 'postgresql',
+          'html', 'css', 'typescript', 'angular', 'vue', 'express', 'django', 'flask',
+          'aws', 'docker', 'kubernetes', 'git', 'github', 'agile', 'scrum', 'rest',
+          'api', 'graphql', 'redux', 'next', 'php', 'ruby', 'c++', 'c#', '.net',
+          'machine learning', 'ai', 'data science', 'analytics', 'tableau', 'power bi'
+        ];
+        
+        commonTechSkills.forEach(skill => {
+          if (jobText.includes(skill) && !cvSkills.includes(skill)) {
+            requiredSkills.add(skill);
+          }
+        });
+      });
+      
+      skillsGap.push(...Array.from(requiredSkills));
+    }
+    
+    res.json({
+      jobs: jobs.slice(0, 20), // Return top 20
+      skillsGap: skillsGap.slice(0, 10), // Top 10 missing skills
+      totalFound: totalFound || jobs.length,
+      cvSkills: cvSkills
+    });
   } catch (error) {
     console.error('Job recommendations error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      message: 'Failed to fetch job recommendations',
+      jobs: [],
+      skillsGap: [],
+      totalFound: 0
+    });
+  }
+});
+
+// Skills gap analysis for a specific job
+router.post('/skills-gap', auth, async (req, res) => {
+  try {
+    const { cvContent, jobDescription, jobTitle } = req.body;
+    
+    if (!cvContent || !jobDescription) {
+      return res.status(400).json({ message: 'CV content and job description are required' });
+    }
+    
+    // Extract CV skills
+    const cvSkills = extractSkillsFromCV(cvContent);
+    
+    // Extract required skills from job description
+    const jobText = `${jobTitle || ''} ${jobDescription}`.toLowerCase();
+    const commonTechSkills = [
+      'javascript', 'python', 'java', 'react', 'node', 'sql', 'mongodb', 'postgresql',
+      'html', 'css', 'typescript', 'angular', 'vue', 'express', 'django', 'flask',
+      'aws', 'docker', 'kubernetes', 'git', 'github', 'agile', 'scrum', 'rest',
+      'api', 'graphql', 'redux', 'next', 'php', 'ruby', 'c++', 'c#', '.net',
+      'machine learning', 'ai', 'data science', 'analytics', 'tableau', 'power bi',
+      'project management', 'leadership', 'team management', 'communication', 'problem solving'
+    ];
+    
+    const requiredSkills = new Set();
+    commonTechSkills.forEach(skill => {
+      if (jobText.includes(skill)) {
+        requiredSkills.add(skill);
+      }
+    });
+    
+    // Use GPT to extract additional skills if available
+    if (process.env.OPENAI_API_KEY && requiredSkills.size < 5) {
+      try {
+        const prompt = `Extract the key technical and professional skills required for this job. Return ONLY a JSON array of skill names (no markdown, no code blocks):
+        
+Job Title: ${jobTitle || 'Not specified'}
+Job Description: ${jobDescription.substring(0, 1000)}
+
+Return format: ["skill1", "skill2", "skill3"]`;
+
+        const completion = await openai.chat.completions.create({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are a job analysis expert. Return ONLY a JSON array of skills, no markdown, no explanations." },
+            { role: "user", content: prompt }
+          ],
+          temperature: 0.5,
+          max_tokens: 300,
+          response_format: { type: "json_object" }
+        });
+        
+        try {
+          const content = completion.choices[0].message.content.trim();
+          let jsonString = content;
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/);
+          if (jsonMatch) {
+            jsonString = jsonMatch[1].trim();
+          }
+          
+          const parsed = JSON.parse(jsonString);
+          const gptSkills = Array.isArray(parsed) ? parsed : (parsed.skills || []);
+          
+          gptSkills.forEach(skill => {
+            if (typeof skill === 'string') {
+              requiredSkills.add(skill.toLowerCase().trim());
+            }
+          });
+        } catch (parseError) {
+          console.error('Error parsing GPT skills:', parseError);
+        }
+      } catch (gptError) {
+        console.error('GPT skills extraction error:', gptError);
+      }
+    }
+    
+    const requiredSkillsArray = Array.from(requiredSkills);
+    const matchingSkills = cvSkills.filter(skill => requiredSkillsArray.includes(skill));
+    const missingSkills = requiredSkillsArray.filter(skill => !cvSkills.includes(skill));
+    
+    const matchPercentage = requiredSkillsArray.length > 0 
+      ? Math.round((matchingSkills.length / requiredSkillsArray.length) * 100)
+      : 0;
+    
+    // Generate recommendations
+    const recommendations = [];
+    if (missingSkills.length > 0) {
+      recommendations.push(`Learn or gain experience with: ${missingSkills.slice(0, 5).join(', ')}`);
+    }
+    if (matchPercentage < 70) {
+      recommendations.push('Consider highlighting your matching skills more prominently in your CV');
+      recommendations.push('Add relevant projects or certifications that demonstrate required skills');
+    }
+    if (matchingSkills.length > 0) {
+      recommendations.push(`You already have these matching skills: ${matchingSkills.join(', ')}`);
+    }
+    
+    res.json({
+      matchPercentage,
+      matchingSkills,
+      missingSkills: missingSkills.slice(0, 15), // Top 15 missing skills
+      requiredSkills: requiredSkillsArray,
+      recommendations: recommendations.length > 0 ? recommendations : ['Your skills match well with this position!']
+    });
+  } catch (error) {
+    console.error('Skills gap analysis error:', error);
+    res.status(500).json({ 
+      message: 'Failed to analyze skills gap',
+      matchPercentage: 0,
+      matchingSkills: [],
+      missingSkills: [],
+      requiredSkills: [],
+      recommendations: []
+    });
   }
 });
 

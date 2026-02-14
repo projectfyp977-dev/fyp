@@ -178,12 +178,23 @@ export const exportCVToDOCX = async (cv, fileName = 'CV') => {
         }
 
         if (skill.items?.length > 0) {
-          children.push(
-            new Paragraph({
-              text: skill.items.join(', '),
-              spacing: { after: 200 },
-            })
-          );
+          const itemsText = skill.items
+            .map((item) =>
+              typeof item === 'string'
+                ? item
+                : item?.name || ''
+            )
+            .filter(Boolean)
+            .join(', ');
+
+          if (itemsText) {
+            children.push(
+              new Paragraph({
+                text: itemsText,
+                spacing: { after: 200 },
+              })
+            );
+          }
         }
       });
     }

@@ -39,45 +39,22 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
   const currentCustomization = cv.customization || customization || {};
 
   const renderTemplate = () => {
-    switch (currentTemplate) {
-      case 'modern':
-        return <ModernTemplate cv={cv} customization={currentCustomization} />;
-      case 'classic':
-        return <ClassicTemplate cv={cv} customization={currentCustomization} />;
-      case 'creative':
-        return <CreativeTemplate cv={cv} customization={currentCustomization} />;
-      case 'minimal':
-        return <MinimalTemplate cv={cv} customization={currentCustomization} />;
-      case 'it-professional':
-        return <ITProfessionalTemplate cv={cv} customization={currentCustomization} />;
-      case 'marketing':
-        return <MarketingTemplate cv={cv} customization={currentCustomization} />;
-      case 'designer':
-        return <DesignerTemplate cv={cv} customization={currentCustomization} />;
-      case 'student':
-        return <StudentTemplate cv={cv} customization={currentCustomization} />;
-      case 'manager':
-        return <ManagerTemplate cv={cv} customization={currentCustomization} />;
-      case 'ats-friendly':
-        return <ATSTemplate cv={cv} customization={currentCustomization} />;
-      case 'two-column':
-        return <TwoColumnTemplate cv={cv} customization={currentCustomization} />;
-      case 'colorful':
-        return <ColorfulTemplate cv={cv} customization={currentCustomization} />;
-      case 'elegant':
-        return <ElegantTemplate cv={cv} customization={currentCustomization} />;
-      case 'bold':
-        return <BoldTemplate cv={cv} customization={currentCustomization} />;
-      case 'academic':
-        return <AcademicTemplate cv={cv} customization={currentCustomization} />;
-      case 'sidebar-left':
+    // Normalize any legacy/non-ATS ids to one of the three ATS templates
+    const normalized =
+      currentTemplate === 'ats-sidebar' || currentTemplate === 'sidebar-left'
+        ? 'ats-sidebar'
+        : currentTemplate === 'ats-card' || currentTemplate === 'card-based'
+        ? 'ats-card'
+        : 'ats-simple';
+
+    switch (normalized) {
+      case 'ats-sidebar':
         return <SidebarLeftTemplate cv={cv} customization={currentCustomization} />;
-      case 'centered-clean':
-        return <CenteredCleanTemplate cv={cv} customization={currentCustomization} />;
-      case 'card-based':
+      case 'ats-card':
         return <CardBasedTemplate cv={cv} customization={currentCustomization} />;
+      case 'ats-simple':
       default:
-        return <ModernTemplate cv={cv} customization={currentCustomization} />;
+        return <CenteredCleanTemplate cv={cv} customization={currentCustomization} />;
     }
   };
 
@@ -113,7 +90,7 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
         }}
       >
         <Typography variant="h6" fontWeight={600}>
-          CV Preview - {currentTemplate.charAt(0).toUpperCase() + currentTemplate.slice(1)} Template
+          CV Preview - ATS Template
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
