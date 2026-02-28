@@ -9,7 +9,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import DescriptionIcon from '@mui/icons-material/Description';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { getApiUrl } from '../utils/apiUrl';
 import axios from 'axios';
 
@@ -142,7 +142,7 @@ const CoverLetterGenerator = ({ cvContent }) => {
           variant="outlined"
           onClick={handleCopy}
           disabled={!coverLetter}
-          startIcon={<ContentCopyIcon />}
+          startIcon={<FileCopyIcon />}
           sx={{ whiteSpace: 'nowrap' }}
         >
           Copy

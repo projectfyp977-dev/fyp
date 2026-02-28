@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -7,31 +7,37 @@ import {
   Button,
   Typography,
   Box,
-  Alert,
   Grid,
+  Alert,
 } from '@mui/material';
-import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+import { getApiUrl } from '../utils/apiUrl';
 
-const Login = () => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setMessage('');
     setLoading(true);
-
-    const result = await login(email, password);
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
-      setError(result.message);
+    try {
+      await axios.post(`${getApiUrl()}/auth/forgot-password`, { email }, { timeout: 10000 });
+      setMessage('If an account exists with this email, you will receive a password reset link shortly.');
+      setEmail('');
+    } catch (err) {
+      if (err.response?.status === 200 || err.response?.data?.message) {
+        setMessage('If an account exists with this email, you will receive a password reset link shortly.');
+        setEmail('');
+      } else {
+        setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -50,11 +56,11 @@ const Login = () => {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Box sx={{ textAlign: 'center', mb: 3, color: 'white' }}>
-              <Typography variant="h3" fontWeight={700} gutterBottom>
+              <Typography variant="h4" fontWeight={700} gutterBottom>
                 ATS CV Builder
               </Typography>
-              <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                Create professional, ATS-optimized CVs, visiting cards, posters & biographics
+              <Typography variant="body1" sx={{ opacity: 0.9 }}>
+                Reset your password
               </Typography>
             </Box>
           </Grid>
@@ -68,15 +74,20 @@ const Login = () => {
               }}
             >
               <Typography variant="h5" component="h1" gutterBottom align="center" fontWeight={600}>
-                Welcome Back
+                Forgot Password
               </Typography>
               <Typography variant="body2" align="center" color="text.secondary" sx={{ mb: 3 }}>
-                Sign in to continue your dashboard
+                Enter your email and we&apos;ll send you a link to reset your password.
               </Typography>
 
               {error && (
                 <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
                   {error}
+                </Alert>
+              )}
+              {message && (
+                <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
+                  {message}
                 </Alert>
               )}
 
@@ -92,30 +103,6 @@ const Login = () => {
                   autoComplete="email"
                   sx={{ mb: 2 }}
                 />
-                <TextField
-                  fullWidth
-                  label="Password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  margin="normal"
-                  required
-                  autoComplete="current-password"
-                  sx={{ mb: 1 }}
-                />
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                  <Link
-                    to="/forgot-password"
-                    style={{
-                      color: '#6366f1',
-                      textDecoration: 'none',
-                      fontSize: '0.875rem',
-                      fontWeight: 500,
-                    }}
-                  >
-                    Forgot password?
-                  </Link>
-                </Box>
                 <Button
                   type="submit"
                   fullWidth
@@ -124,20 +111,20 @@ const Login = () => {
                   sx={{ mt: 2, mb: 2, py: 1.5, borderRadius: 2 }}
                   disabled={loading}
                 >
-                  {loading ? 'Signing in...' : 'Sign In'}
+                  {loading ? 'Sending...' : 'Send reset link'}
                 </Button>
                 <Box textAlign="center">
                   <Typography variant="body2" color="text.secondary">
-                    Don't have an account?{' '}
+                    Remember your password?{' '}
                     <Link
-                      to="/register"
+                      to="/login"
                       style={{
                         color: '#6366f1',
                         textDecoration: 'none',
                         fontWeight: 600,
                       }}
                     >
-                      Sign up
+                      Sign in
                     </Link>
                   </Typography>
                 </Box>
@@ -150,4 +137,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ForgotPassword;

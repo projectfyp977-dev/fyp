@@ -27,6 +27,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { getApiUrl } from '../utils/apiUrl';
@@ -41,6 +42,7 @@ const Dashboard = () => {
   const [selectedCv, setSelectedCv] = useState(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewCv, setPreviewCv] = useState(null);
+  const [createMenuAnchor, setCreateMenuAnchor] = useState(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -97,6 +99,18 @@ const Dashboard = () => {
   const handleCloseMenu = () => {
     setAnchorEl(null);
     setSelectedCv(null);
+  };
+
+  const documentTypes = [
+    { value: 'cv', label: 'CV / Resume', desc: 'ATS-optimized CV' },
+    { value: 'visiting-card', label: 'Visiting Card', desc: 'ATS-friendly visiting card' },
+    { value: 'poster', label: 'Poster', desc: 'ATS-optimized poster' },
+    { value: 'biographics', label: 'Biographics', desc: 'ATS-friendly biography' },
+  ];
+
+  const handleCreateNew = (documentType) => {
+    setCreateMenuAnchor(null);
+    navigate('/cv/new', { state: { documentType: documentType || 'cv' } });
   };
 
   const handleLogout = () => {
@@ -230,10 +244,10 @@ const Dashboard = () => {
             gutterBottom
             sx={{ color: 'text.primary', letterSpacing: '-0.02em' }}
           >
-            My CVs
+            My Documents
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 560 }}>
-            Create, optimize, and download ATS-friendly CVs with built-in scoring and AI suggestions.
+            Create, optimize, and download ATS-friendly CVs, visiting cards, posters & biographics with built-in scoring and AI suggestions.
           </Typography>
         </Box>
 
@@ -265,20 +279,33 @@ const Dashboard = () => {
               <AddIcon sx={{ fontSize: 44, color: 'white' }} />
             </Box>
             <Typography variant="h6" fontWeight={600} gutterBottom sx={{ color: 'text.primary' }}>
-              No CVs yet
+              No documents yet
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Create your first professional CV with our easy-to-use editor
+              Create your first CV, visiting card, poster or biographic — all ATS-optimized
             </Typography>
             <Button
               variant="contained"
               size="large"
               startIcon={<AddIcon />}
-              onClick={() => navigate('/cv/new')}
+              onClick={() => handleCreateNew('cv')}
               sx={{ px: 4, py: 1.5, borderRadius: 2, fontWeight: 600 }}
             >
-              Create Your First CV
+              Create Your First Document
             </Button>
+            <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+              {documentTypes.map((dt) => (
+                <Button
+                  key={dt.value}
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handleCreateNew(dt.value)}
+                  sx={{ borderRadius: 2 }}
+                >
+                  {dt.label}
+                </Button>
+              ))}
+            </Box>
           </Card>
         ) : (
           <>
@@ -286,8 +313,9 @@ const Dashboard = () => {
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={() => navigate('/cv/new')}
-                sx={{ 
+                endIcon={<ArrowDropDownIcon />}
+                onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
+                sx={{
                   borderRadius: 2,
                   px: 3,
                   py: 1.25,
@@ -297,8 +325,29 @@ const Dashboard = () => {
                   '&:hover': { background: 'linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)', boxShadow: '0 6px 20px rgba(99, 102, 241, 0.45)' }
                 }}
               >
-                Create New CV
+                Create New
               </Button>
+              <Menu
+                anchorEl={createMenuAnchor}
+                open={Boolean(createMenuAnchor)}
+                onClose={() => setCreateMenuAnchor(null)}
+                PaperProps={{ sx: { minWidth: 220, borderRadius: 2, mt: 1.5 } }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                {documentTypes.map((dt) => (
+                  <MenuItem
+                    key={dt.value}
+                    onClick={() => handleCreateNew(dt.value)}
+                    sx={{ py: 1.5 }}
+                  >
+                    <Box>
+                      <Typography variant="body1" fontWeight={600}>{dt.label}</Typography>
+                      <Typography variant="caption" color="text.secondary">{dt.desc}</Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Menu>
             </Box>
             <Grid container spacing={3}>
               {cvs.map((cv) => {
@@ -344,8 +393,12 @@ const Dashboard = () => {
                         </Box>
                         <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
                           Updated {new Date(cv.updatedAt).toLocaleDateString()}
+                          {(cv.documentType && cv.documentType !== 'cv') && ` • ${cv.documentType === 'visiting-card' ? 'Visiting Card' : cv.documentType === 'poster' ? 'Poster' : cv.documentType === 'biographics' ? 'Biographics' : cv.documentType}`}
                         </Typography>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                          {(cv.documentType && cv.documentType !== 'cv') && (
+                            <Chip label={cv.documentType === 'visiting-card' ? 'Visiting Card' : cv.documentType === 'poster' ? 'Poster' : cv.documentType === 'biographics' ? 'Biographics' : cv.documentType} size="small" sx={{ borderRadius: 1.5, bgcolor: 'primary.light', color: 'primary.dark' }} />
+                          )}
                           {cv.personalInfo?.fullName && (
                             <Chip label={cv.personalInfo.fullName} size="small" variant="outlined" sx={{ borderRadius: 1.5 }} />
                           )}
@@ -410,7 +463,10 @@ const Dashboard = () => {
           right: 24,
           display: { xs: 'flex', sm: 'none' },
         }}
-        onClick={() => navigate('/cv/new')}
+        onClick={() => {
+          setCreateMenuAnchor(null);
+          navigate('/cv/new', { state: { documentType: 'cv' } });
+        }}
       >
         <AddIcon />
       </Fab>

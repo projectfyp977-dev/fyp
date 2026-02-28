@@ -47,6 +47,7 @@ async function setupDatabase() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         userId INT NOT NULL,
         title VARCHAR(255) DEFAULT 'My CV',
+        document_type VARCHAR(50) DEFAULT 'cv',
         personalInfo JSON,
         professionalSummary TEXT,
         workExperience JSON,

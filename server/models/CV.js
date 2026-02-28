@@ -6,6 +6,7 @@ class CV {
     const {
       userId,
       title = 'My CV',
+      documentType = 'cv',
       personalInfo,
       professionalSummary = '',
       workExperience = [],
@@ -18,12 +19,13 @@ class CV {
 
     const [result] = await pool.execute(
       `INSERT INTO cvs 
-       (userId, title, personalInfo, professionalSummary, workExperience, 
+       (userId, title, document_type, personalInfo, professionalSummary, workExperience, 
         education, skills, certifications, languages, projects) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId,
         title,
+        documentType || 'cv',
         JSON.stringify(personalInfo || {}),
         professionalSummary,
         JSON.stringify(workExperience),
@@ -80,6 +82,7 @@ class CV {
   static async update(id, userId, updateData) {
     const {
       title,
+      documentType,
       personalInfo,
       professionalSummary,
       workExperience,
@@ -96,6 +99,10 @@ class CV {
     if (title !== undefined) {
       updates.push('title = ?');
       values.push(title);
+    }
+    if (documentType !== undefined) {
+      updates.push('document_type = ?');
+      values.push(documentType);
     }
     if (personalInfo !== undefined) {
       updates.push('personalInfo = ?');
@@ -161,6 +168,7 @@ class CV {
       id: row.id,
       userId: row.userId,
       title: row.title,
+      documentType: row.document_type || 'cv',
       personalInfo: typeof row.personalInfo === 'string' ? JSON.parse(row.personalInfo) : row.personalInfo,
       professionalSummary: row.professionalSummary,
       workExperience: typeof row.workExperience === 'string' ? JSON.parse(row.workExperience) : row.workExperience,

@@ -103,6 +103,21 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Forgot password (sends reset link - email integration can be added later)
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Please provide your email' });
+    }
+    // Optional: check if user exists, send email via nodemailer etc.
+    res.json({ message: 'If an account exists with this email, you will receive a password reset link shortly.' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Get current user
 router.get('/me', require('../middleware/auth'), async (req, res) => {
   res.json({

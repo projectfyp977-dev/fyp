@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -46,10 +46,19 @@ import { getApiUrl } from '../utils/apiUrl';
 
 const CVEditor = () => {
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+  const documentTypeFromState = location.state?.documentType || 'cv';
+  const defaultTemplateByType = {
+    cv: 'ats-simple',
+    'visiting-card': 'vc-minimal',
+    poster: 'poster-ats-clean',
+    biographics: 'bio-ats-simple',
+  };
+  const [documentType, setDocumentType] = useState(documentTypeFromState);
   const [loading, setLoading] = useState(!!id);
   const [saving, setSaving] = useState(false);
-  const [template, setTemplate] = useState('ats-simple');
+  const [template, setTemplate] = useState(defaultTemplateByType[documentTypeFromState] || 'ats-simple');
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [customization, setCustomization] = useState({
@@ -84,7 +93,8 @@ const CVEditor = () => {
     },
   });
   const [cv, setCv] = useState({
-    title: 'My CV',
+    title: documentTypeFromState === 'cv' ? 'My CV' : documentTypeFromState === 'visiting-card' ? 'My Visiting Card' : documentTypeFromState === 'poster' ? 'My Poster' : 'My Biographics',
+    documentType: documentTypeFromState,
     template: 'ats-simple',
     customization: {
       fontFamily: 'Inter',
@@ -150,6 +160,7 @@ const CVEditor = () => {
       };
       
       setCv(normalizedCv);
+      if (cvData.documentType) setDocumentType(cvData.documentType);
       if (cvData.template) {
         setTemplate(cvData.template);
       }
@@ -208,6 +219,7 @@ const CVEditor = () => {
 
       const cvToSave = {
         ...cv,
+        documentType: documentType,
         template: template,
         customization: customization,
       };
@@ -353,16 +365,19 @@ const CVEditor = () => {
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography 
-            variant="h6" 
-            component="div" 
-            sx={{ 
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
               flexGrow: 1,
               fontWeight: 600,
               color: 'text.primary',
             }}
           >
-            CV Editor
+            {documentType === 'cv' && 'CV Editor'}
+            {documentType === 'visiting-card' && 'Visiting Card Editor'}
+            {documentType === 'poster' && 'Poster Editor'}
+            {documentType === 'biographics' && 'Biographics Editor'}
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             <Button
@@ -406,7 +421,7 @@ const CVEditor = () => {
             >
               <TextField
                 fullWidth
-                label="CV Title"
+                label={documentType === 'cv' ? 'CV Title' : documentType === 'visiting-card' ? 'Visiting Card Title' : documentType === 'poster' ? 'Poster Title' : 'Biographics Title'}
                 value={cv.title}
                 onChange={(e) => updateField('title', e.target.value)}
                 margin="normal"
@@ -1173,6 +1188,7 @@ const CVEditor = () => {
           }
         }}
         selectedTemplate={template}
+        documentType={documentType}
       />
 
       {/* CV Preview Dialog */}

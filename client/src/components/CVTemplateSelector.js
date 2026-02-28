@@ -16,32 +16,30 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const templates = {
-  // Only 3 ATS-focused templates exposed to user
   all: [
-    {
-      id: 'ats-simple',
-      name: 'ATS Simple',
-      description: 'Single-column, clean ATS-friendly layout',
-      category: 'ATS',
-      color: '#0f766e',
-      preview: 'ats-simple',
-    },
-    {
-      id: 'ats-sidebar',
-      name: 'ATS Sidebar',
-      description: 'Left sidebar for contact & skills, ATS-safe structure',
-      category: 'ATS',
-      color: '#2563eb',
-      preview: 'ats-sidebar',
-    },
-    {
-      id: 'ats-card',
-      name: 'ATS Card',
-      description: 'Section cards with clear headings for ATS parsing',
-      category: 'ATS',
-      color: '#7c3aed',
-      preview: 'ats-card',
-    },
+    { id: 'ats-simple', name: 'ATS Simple', description: 'Single-column, clean ATS-friendly layout', category: 'ATS', color: '#0f766e', preview: 'ats-simple' },
+    { id: 'ats-sidebar', name: 'ATS Sidebar', description: 'Left sidebar for contact & skills, ATS-safe structure', category: 'ATS', color: '#2563eb', preview: 'ats-sidebar' },
+    { id: 'ats-card', name: 'ATS Card', description: 'Section cards with clear headings for ATS parsing', category: 'ATS', color: '#7c3aed', preview: 'ats-card' },
+  ],
+  cv: [
+    { id: 'ats-simple', name: 'ATS Simple', description: 'Single-column, clean ATS-friendly layout', category: 'ATS', color: '#0f766e', preview: 'ats-simple' },
+    { id: 'ats-sidebar', name: 'ATS Sidebar', description: 'Left sidebar for contact & skills, ATS-safe structure', category: 'ATS', color: '#2563eb', preview: 'ats-sidebar' },
+    { id: 'ats-card', name: 'ATS Card', description: 'Section cards with clear headings for ATS parsing', category: 'ATS', color: '#7c3aed', preview: 'ats-card' },
+  ],
+  'visiting-card': [
+    { id: 'vc-minimal', name: 'ATS Minimal Card', description: 'Clean, ATS-friendly visiting card', category: 'ATS', color: '#059669', preview: 'vc-minimal' },
+    { id: 'vc-professional', name: 'ATS Professional', description: 'Professional layout for business cards', category: 'ATS', color: '#2563eb', preview: 'vc-professional' },
+    { id: 'vc-modern', name: 'ATS Modern', description: 'Modern design with clear structure', category: 'ATS', color: '#7c3aed', preview: 'vc-modern' },
+  ],
+  poster: [
+    { id: 'poster-ats-clean', name: 'ATS Clean Poster', description: 'Clean, ATS-optimized poster layout', category: 'ATS', color: '#dc2626', preview: 'poster-clean' },
+    { id: 'poster-ats-bold', name: 'ATS Bold Poster', description: 'Bold sections for easy parsing', category: 'ATS', color: '#ea580c', preview: 'poster-bold' },
+    { id: 'poster-ats-elegant', name: 'ATS Elegant', description: 'Elegant poster with ATS structure', category: 'ATS', color: '#4f46e5', preview: 'poster-elegant' },
+  ],
+  biographics: [
+    { id: 'bio-ats-simple', name: 'ATS Simple Bio', description: 'Clean biography layout', category: 'ATS', color: '#0f766e', preview: 'ats-simple' },
+    { id: 'bio-ats-narrative', name: 'ATS Narrative', description: 'Story-style with clear sections', category: 'ATS', color: '#7c3aed', preview: 'ats-sidebar' },
+    { id: 'bio-ats-card', name: 'ATS Bio Card', description: 'Card-style biography', category: 'ATS', color: '#2563eb', preview: 'ats-card' },
   ],
 };
 
@@ -88,6 +86,48 @@ const TemplatePreview = ({ template }) => {
             <Box sx={{ width: '70%', height: 3, bgcolor: '#e5e7eb', borderRadius: 1 }} />
           </Box>
         </Box>
+      </Box>
+    ),
+    'vc-minimal': (
+      <Box sx={{ p: 1.5, bgcolor: '#059669', borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1 }}>
+        <Box sx={{ width: 50, height: 50, borderRadius: '50%', bgcolor: 'white', mx: 'auto' }} />
+        <Box sx={{ width: '90%', height: 4, bgcolor: 'white', borderRadius: 1, mx: 'auto' }} />
+        <Box sx={{ width: '70%', height: 3, bgcolor: 'rgba(255,255,255,0.8)', borderRadius: 1, mx: 'auto' }} />
+      </Box>
+    ),
+    'vc-professional': (
+      <Box sx={{ p: 1.5, bgcolor: '#2563eb', borderRadius: 2, height: '100%', display: 'flex', gap: 1 }}>
+        <Box sx={{ width: 40, height: 40, bgcolor: 'white', borderRadius: 1 }} />
+        <Box sx={{ flex: 1 }}>
+          <Box sx={{ width: '100%', height: 4, bgcolor: 'white', borderRadius: 1, mb: 0.5 }} />
+          <Box sx={{ width: '80%', height: 3, bgcolor: 'rgba(255,255,255,0.8)', borderRadius: 1 }} />
+        </Box>
+      </Box>
+    ),
+    'vc-modern': (
+      <Box sx={{ p: 1.5, borderRadius: 2, height: '100%', background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1 }}>
+        <Box sx={{ width: '85%', height: 5, bgcolor: 'white', borderRadius: 1, mx: 'auto' }} />
+        <Box sx={{ width: '60%', height: 3, bgcolor: 'rgba(255,255,255,0.9)', borderRadius: 1, mx: 'auto' }} />
+      </Box>
+    ),
+    'poster-clean': (
+      <Box sx={{ p: 1.5, bgcolor: '#fef2f2', borderRadius: 2, height: '100%', border: '2px solid #dc2626' }}>
+        <Box sx={{ width: '100%', height: 8, bgcolor: '#dc2626', borderRadius: 1, mb: 1 }} />
+        <Box sx={{ width: '90%', height: 4, bgcolor: '#e5e7eb', borderRadius: 1, mb: 0.5 }} />
+        <Box sx={{ width: '80%', height: 4, bgcolor: '#e5e7eb', borderRadius: 1 }} />
+      </Box>
+    ),
+    'poster-bold': (
+      <Box sx={{ p: 1.5, bgcolor: '#ea580c', borderRadius: 0, height: '100%', border: '3px solid white' }}>
+        <Box sx={{ width: '100%', height: 10, bgcolor: 'white', mb: 1 }} />
+        <Box sx={{ width: '70%', height: 4, bgcolor: 'rgba(255,255,255,0.9)', borderRadius: 1 }} />
+      </Box>
+    ),
+    'poster-elegant': (
+      <Box sx={{ p: 1.5, bgcolor: '#4f46e5', borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box sx={{ width: '50%', height: 6, bgcolor: 'white', borderRadius: 1, mx: 'auto', mb: 1 }} />
+        <Box sx={{ width: '100%', height: 2, bgcolor: 'rgba(255,255,255,0.5)', mb: 0.5 }} />
+        <Box sx={{ width: '85%', height: 4, bgcolor: 'rgba(255,255,255,0.8)', borderRadius: 1, mx: 'auto' }} />
       </Box>
     ),
     // Fallback (not really used now, but keeps default safe)
@@ -274,24 +314,25 @@ const TemplatePreview = ({ template }) => {
   return previews[template.preview] || previews.modern;
 };
 
-const CVTemplateSelector = ({ open, onClose, onSelect, selectedTemplate }) => {
+const CVTemplateSelector = ({ open, onClose, onSelect, selectedTemplate, documentType = 'cv' }) => {
   const [category, setCategory] = React.useState('all');
 
-  // Only one category (ATS) for now
+  const templateList = templates[documentType] || templates.cv || templates.all;
   const categories = ['all', 'ATS'];
-
   const filteredTemplates = category === 'all'
-    ? templates.all
-    : templates.all.filter(t => t.category === 'ATS');
+    ? templateList
+    : templateList.filter(t => t.category === 'ATS');
+
+  const docTypeLabel = documentType === 'cv' ? 'CV' : documentType === 'visiting-card' ? 'Visiting Card' : documentType === 'poster' ? 'Poster' : 'Biographics';
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>
         <Typography variant="h5" fontWeight={600}>
-          Choose CV Template
+          Choose {docTypeLabel} Template
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Select a template that best represents your professional style
+          All templates are ATS-optimized for best results
         </Typography>
       </DialogTitle>
       <DialogContent>
