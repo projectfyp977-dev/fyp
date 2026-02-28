@@ -52,6 +52,16 @@ class User {
   static async comparePassword(userPassword, candidatePassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
   }
+
+  // Update password by email (for reset without email sending)
+  static async updatePasswordByEmail(email, newPassword) {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const [result] = await pool.execute(
+      'UPDATE users SET password = ? WHERE email = ?',
+      [hashedPassword, email]
+    );
+    return result.affectedRows > 0;
+  }
 }
 
 module.exports = User;

@@ -103,17 +103,23 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Forgot password (sends reset link - email integration can be added later)
-router.post('/forgot-password', async (req, res) => {
+// Reset password (no email sent - user enters email + new password)
+router.post('/reset-password', async (req, res) => {
   try {
-    const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ message: 'Please provide your email' });
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+      return res.status(400).json({ message: 'Please provide email and new password' });
     }
-    // Optional: check if user exists, send email via nodemailer etc.
-    res.json({ message: 'If an account exists with this email, you will receive a password reset link shortly.' });
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+    const updated = await User.updatePasswordByEmail(email, newPassword);
+    if (!updated) {
+      return res.status(400).json({ message: 'No account found with this email' });
+    }
+    res.json({ message: 'Password reset successfully. You can now sign in.' });
   } catch (error) {
-    console.error('Forgot password error:', error);
+    console.error('Reset password error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

@@ -13,8 +13,10 @@ import {
 import axios from 'axios';
 import { getApiUrl } from '../utils/apiUrl';
 
-const ForgotPassword = () => {
+const ResetPassword = () => {
   const [email, setEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,18 +25,27 @@ const ForgotPassword = () => {
     e.preventDefault();
     setError('');
     setMessage('');
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
     setLoading(true);
     try {
-      await axios.post(`${getApiUrl()}/auth/forgot-password`, { email }, { timeout: 10000 });
-      setMessage('If an account exists with this email, you will receive a password reset link shortly.');
+      const res = await axios.post(
+        `${getApiUrl()}/auth/reset-password`,
+        { email, newPassword },
+        { timeout: 10000 }
+      );
+      setMessage(res.data?.message || 'Password reset successfully. You can now sign in.');
       setEmail('');
+      setNewPassword('');
+      setConfirmPassword('');
     } catch (err) {
-      if (err.response?.status === 200 || err.response?.data?.message) {
-        setMessage('If an account exists with this email, you will receive a password reset link shortly.');
-        setEmail('');
-      } else {
-        setError(err.response?.data?.message || 'Something went wrong. Please try again.');
-      }
+      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -74,10 +85,10 @@ const ForgotPassword = () => {
               }}
             >
               <Typography variant="h5" component="h1" gutterBottom align="center" fontWeight={600}>
-                Forgot Password
+                Reset Password
               </Typography>
               <Typography variant="body2" align="center" color="text.secondary" sx={{ mb: 3 }}>
-                Enter your email and we&apos;ll send you a link to reset your password.
+                Enter your email and choose a new password. No email will be sent.
               </Typography>
 
               {error && (
@@ -103,6 +114,28 @@ const ForgotPassword = () => {
                   autoComplete="email"
                   sx={{ mb: 2 }}
                 />
+                <TextField
+                  fullWidth
+                  label="New password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  margin="normal"
+                  required
+                  autoComplete="new-password"
+                  sx={{ mb: 2 }}
+                />
+                <TextField
+                  fullWidth
+                  label="Confirm new password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  margin="normal"
+                  required
+                  autoComplete="new-password"
+                  sx={{ mb: 2 }}
+                />
                 <Button
                   type="submit"
                   fullWidth
@@ -111,7 +144,7 @@ const ForgotPassword = () => {
                   sx={{ mt: 2, mb: 2, py: 1.5, borderRadius: 2 }}
                   disabled={loading}
                 >
-                  {loading ? 'Sending...' : 'Send reset link'}
+                  {loading ? 'Resetting...' : 'Reset password'}
                 </Button>
                 <Box textAlign="center">
                   <Typography variant="body2" color="text.secondary">
@@ -137,4 +170,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default ResetPassword;

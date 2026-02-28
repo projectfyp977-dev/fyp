@@ -34,7 +34,6 @@ import axios from 'axios';
 import VoiceInput from '../components/VoiceInput';
 import AISuggestions from '../components/AISuggestions';
 import ATSScoreChecker from '../components/ATSScoreChecker';
-import CoverLetterGenerator from '../components/CoverLetterGenerator';
 import CVTemplateSelector from '../components/CVTemplateSelector';
 import CVPreview from '../components/CVPreview';
 import CVCustomization from '../components/CVCustomization';
@@ -111,6 +110,7 @@ const CVEditor = () => {
       email: '',
       phone: '',
       address: '',
+      company: '',
       linkedIn: '',
       website: '',
       github: '',
@@ -379,17 +379,19 @@ const CVEditor = () => {
             {documentType === 'poster' && 'Poster Editor'}
             {documentType === 'biographics' && 'Biographics Editor'}
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: { xs: 'flex-end', sm: 'flex-start' } }}>
             <Button
               variant="outlined"
+              size="small"
               startIcon={<PaletteIcon />}
               onClick={() => setTemplateDialogOpen(true)}
-              sx={{ display: { xs: 'none', sm: 'flex' } }}
+              sx={{ borderRadius: 2 }}
             >
               Template
             </Button>
             <Button
               variant="outlined"
+              size="small"
               startIcon={<PreviewIcon />}
               onClick={() => setPreviewOpen(true)}
             >
@@ -397,6 +399,7 @@ const CVEditor = () => {
             </Button>
             <Button
               variant="contained"
+              size="small"
               startIcon={<SaveIcon />}
               onClick={handleSave}
               disabled={saving}
@@ -448,6 +451,15 @@ const CVEditor = () => {
                         placeholder="e.g. Software Engineer, CMS Developer, Designer"
                       />
                     </Grid>
+                    {(documentType === 'visiting-card' || documentType === 'poster') && (
+                      <Grid item xs={12} sm={6}>
+                        <VoiceInput
+                          label="Company / Brand"
+                          value={cv.personalInfo.company || ''}
+                          onChange={(value) => updateField('personalInfo.company', value)}
+                        />
+                      </Grid>
+                    )}
                     <Grid item xs={12} sm={6}>
                       <VoiceInput
                         label="Email"
@@ -462,20 +474,24 @@ const CVEditor = () => {
                         onChange={(value) => updateField('personalInfo.phone', value)}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <VoiceInput
-                        label="Address"
-                        value={cv.personalInfo.address}
-                        onChange={(value) => updateField('personalInfo.address', value)}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <VoiceInput
-                        label="LinkedIn"
-                        value={cv.personalInfo.linkedIn}
-                        onChange={(value) => updateField('personalInfo.linkedIn', value)}
-                      />
-                    </Grid>
+                    {documentType === 'cv' && (
+                      <Grid item xs={12} sm={6}>
+                        <VoiceInput
+                          label="Address"
+                          value={cv.personalInfo.address}
+                          onChange={(value) => updateField('personalInfo.address', value)}
+                        />
+                      </Grid>
+                    )}
+                    {documentType === 'cv' && (
+                      <Grid item xs={12} sm={6}>
+                        <VoiceInput
+                          label="LinkedIn"
+                          value={cv.personalInfo.linkedIn}
+                          onChange={(value) => updateField('personalInfo.linkedIn', value)}
+                        />
+                      </Grid>
+                    )}
                     <Grid item xs={12} sm={6}>
                       <VoiceInput
                         label="Website"
@@ -483,13 +499,15 @@ const CVEditor = () => {
                         onChange={(value) => updateField('personalInfo.website', value)}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <VoiceInput
-                        label="GitHub"
-                        value={cv.personalInfo.github}
-                        onChange={(value) => updateField('personalInfo.github', value)}
-                      />
-                    </Grid>
+                    {documentType === 'cv' && (
+                      <Grid item xs={12} sm={6}>
+                        <VoiceInput
+                          label="GitHub"
+                          value={cv.personalInfo.github}
+                          onChange={(value) => updateField('personalInfo.github', value)}
+                        />
+                      </Grid>
+                    )}
                     <Grid item xs={12}>
                       <Box sx={{ mt: 2 }}>
                         <Typography variant="subtitle2" gutterBottom>
@@ -537,22 +555,28 @@ const CVEditor = () => {
                 </AccordionDetails>
               </Accordion>
 
-              <Accordion>
+              {(documentType === 'cv' || documentType === 'visiting-card' || documentType === 'poster' || documentType === 'biographics') && (
+              <Accordion defaultExpanded={documentType !== 'cv'}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6">Professional Summary</Typography>
+                  <Typography variant="h6">
+                    {documentType === 'visiting-card' ? 'Tagline' : documentType === 'poster' ? 'Poster Text' : documentType === 'biographics' ? 'Biography' : 'Professional Summary'}
+                  </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <VoiceInput
-                    label="Summary"
+                    label={documentType === 'visiting-card' ? 'Tagline' : documentType === 'poster' ? 'Main text' : 'Summary'}
                     value={cv.professionalSummary}
                     onChange={(value) => updateField('professionalSummary', value)}
                     multiline
-                    rows={4}
+                    rows={documentType === 'visiting-card' ? 2 : 4}
                   />
-                  <AISuggestions text={cv.professionalSummary} context="professional summary" />
+                  {documentType === 'cv' && <AISuggestions text={cv.professionalSummary} context="professional summary" />}
                 </AccordionDetails>
               </Accordion>
+              )}
 
+              {documentType === 'cv' && (
+              <>
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography variant="h6">Work Experience</Typography>
@@ -1162,6 +1186,8 @@ const CVEditor = () => {
                   </Button>
                 </AccordionDetails>
               </Accordion>
+              </>
+              )}
             </Paper>
           </Grid>
 
@@ -1169,7 +1195,6 @@ const CVEditor = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <CVCustomization customization={customization} onChange={setCustomization} />
               <ATSScoreChecker cvContent={cv} />
-              <CoverLetterGenerator cvContent={cv} />
               <AISuggestions cvContent={cv} />
             </Box>
           </Grid>

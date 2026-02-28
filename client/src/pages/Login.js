@@ -68,7 +68,7 @@ const Login = () => {
               }}
             >
               <Typography variant="h5" component="h1" gutterBottom align="center" fontWeight={600}>
-                Welcome Back
+                Hello
               </Typography>
               <Typography variant="body2" align="center" color="text.secondary" sx={{ mb: 3 }}>
                 Sign in to continue your dashboard
@@ -105,7 +105,7 @@ const Login = () => {
                 />
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                   <Link
-                    to="/forgot-password"
+                    to="/reset-password"
                     style={{
                       color: '#6366f1',
                       textDecoration: 'none',
@@ -113,7 +113,7 @@ const Login = () => {
                       fontWeight: 500,
                     }}
                   >
-                    Forgot password?
+                    Reset password?
                   </Link>
                 </Box>
                 <Button

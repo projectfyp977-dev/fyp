@@ -37,9 +37,19 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
 
   const currentTemplate = cv.template || template;
   const currentCustomization = cv.customization || customization || {};
+  const documentType = cv.documentType || 'cv';
 
   const renderTemplate = () => {
-    // Normalize any legacy/non-ATS ids to one of the three ATS templates
+    if (documentType === 'visiting-card') {
+      return <VisitingCardTemplate cv={cv} customization={currentCustomization} />;
+    }
+    if (documentType === 'poster') {
+      return <PosterTemplate cv={cv} customization={currentCustomization} />;
+    }
+    if (documentType === 'biographics') {
+      return <BiographicsTemplate cv={cv} customization={currentCustomization} />;
+    }
+    // CV templates
     const normalized =
       currentTemplate === 'ats-sidebar' || currentTemplate === 'sidebar-left'
         ? 'ats-sidebar'
@@ -90,9 +100,9 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
         }}
       >
         <Typography variant="h6" fontWeight={600}>
-          CV Preview - ATS Template
+          {documentType === 'cv' ? 'CV' : documentType === 'visiting-card' ? 'Visiting Card' : documentType === 'poster' ? 'Poster' : 'Biographics'} Preview
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
           <Button
             variant="outlined"
             startIcon={<PictureAsPdfIcon />}
@@ -101,6 +111,7 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
           >
             PDF
           </Button>
+          {documentType === 'cv' && (
           <Button
             variant="outlined"
             startIcon={<DescriptionIcon />}
@@ -109,6 +120,7 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
           >
             DOCX
           </Button>
+          )}
           <IconButton onClick={onClose}>
             <CloseIcon />
           </IconButton>
@@ -134,6 +146,132 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
     </Dialog>
   );
 };
+
+// Visiting Card Template (ATS-friendly card layout)
+const VisitingCardTemplate = ({ cv, customization }) => (
+  <Paper
+    elevation={2}
+    sx={{
+      width: 320,
+      minHeight: 200,
+      mx: 'auto',
+      p: 2.5,
+      bgcolor: 'white',
+      borderRadius: 2,
+      border: '1px solid',
+      borderColor: 'divider',
+      fontFamily: customization?.fontFamily || 'Inter',
+      fontSize: 13,
+      color: customization?.textColor || '#1e293b',
+    }}
+  >
+    <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+      {cv.personalInfo?.photo && (
+        <Box
+          component="img"
+          src={cv.personalInfo.photo}
+          alt=""
+          sx={{ width: 72, height: 72, borderRadius: 1, objectFit: 'cover', flexShrink: 0 }}
+        />
+      )}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Typography variant="subtitle1" fontWeight={700} sx={{ color: customization?.headingColor || '#6366f1', lineHeight: 1.3 }}>
+          {cv.personalInfo?.fullName || 'Name'}
+        </Typography>
+        {cv.personalInfo?.jobTitle && (
+          <Typography variant="body2" fontWeight={600} sx={{ mt: 0.5 }}>{cv.personalInfo.jobTitle}</Typography>
+        )}
+        {cv.personalInfo?.company && (
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>{cv.personalInfo.company}</Typography>
+        )}
+        {cv.professionalSummary && (
+          <Typography variant="caption" display="block" sx={{ mt: 1, fontStyle: 'italic' }}>{cv.professionalSummary}</Typography>
+        )}
+        <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+          {cv.personalInfo?.email && <Typography variant="caption">{cv.personalInfo.email}</Typography>}
+          {cv.personalInfo?.phone && <Typography variant="caption">{cv.personalInfo.phone}</Typography>}
+          {cv.personalInfo?.website && <Typography variant="caption">{cv.personalInfo.website}</Typography>}
+        </Box>
+      </Box>
+    </Box>
+  </Paper>
+);
+
+// Poster Template
+const PosterTemplate = ({ cv, customization }) => (
+  <Paper
+    elevation={0}
+    sx={{
+      maxWidth: 400,
+      minHeight: 360,
+      mx: 'auto',
+      p: 3,
+      bgcolor: 'white',
+      border: '2px solid',
+      borderColor: customization?.headingColor || '#6366f1',
+      borderRadius: 2,
+      fontFamily: customization?.fontFamily || 'Inter',
+      fontSize: customization?.fontSize || 14,
+      color: customization?.textColor || '#1e293b',
+    }}
+  >
+    <Typography variant="h5" fontWeight={700} gutterBottom sx={{ color: customization?.headingColor || '#6366f1', textAlign: 'center' }}>
+      {cv.title || 'Poster Title'}
+    </Typography>
+    {cv.personalInfo?.fullName && (
+      <Typography variant="h6" fontWeight={600} sx={{ textAlign: 'center', mb: 2 }}>{cv.personalInfo.fullName}</Typography>
+    )}
+    {cv.personalInfo?.company && (
+      <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 2 }}>{cv.personalInfo.company}</Typography>
+    )}
+    {cv.professionalSummary && (
+      <Typography variant="body1" sx={{ mt: 2, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{cv.professionalSummary}</Typography>
+    )}
+    {cv.personalInfo?.photo && (
+      <Box sx={{ textAlign: 'center', mt: 2 }}>
+        <Box component="img" src={cv.personalInfo.photo} alt="" sx={{ maxWidth: '100%', maxHeight: 180, borderRadius: 1 }} />
+      </Box>
+    )}
+  </Paper>
+);
+
+// Biographics Template
+const BiographicsTemplate = ({ cv, customization }) => (
+  <Paper
+    elevation={0}
+    sx={{
+      maxWidth: 600,
+      mx: 'auto',
+      p: 4,
+      bgcolor: 'white',
+      border: '1px solid',
+      borderColor: 'divider',
+      borderRadius: 2,
+      fontFamily: customization?.fontFamily || 'Inter',
+      fontSize: customization?.fontSize || 14,
+      color: customization?.textColor || '#1e293b',
+      lineHeight: customization?.lineSpacing || 1.6,
+    }}
+  >
+    <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      {cv.personalInfo?.photo && (
+        <Box component="img" src={cv.personalInfo.photo} alt="" sx={{ width: 120, height: 120, borderRadius: 2, objectFit: 'cover' }} />
+      )}
+      <Box sx={{ flex: 1, minWidth: 200 }}>
+        <Typography variant="h5" fontWeight={700} sx={{ color: customization?.headingColor || '#6366f1' }}>
+          {cv.personalInfo?.fullName || 'Name'}
+        </Typography>
+        {cv.personalInfo?.jobTitle && (
+          <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 0.5 }}>{cv.personalInfo.jobTitle}</Typography>
+        )}
+      </Box>
+    </Box>
+    <Divider sx={{ my: 3 }} />
+    {cv.professionalSummary && (
+      <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{cv.professionalSummary}</Typography>
+    )}
+  </Paper>
+);
 
 // Helper function to render sections
 const renderSection = (title, icon, children, color = '#6366f1') => (

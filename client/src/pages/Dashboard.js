@@ -430,6 +430,7 @@ const Dashboard = () => {
                         >
                           <PictureAsPdfIcon fontSize="small" />
                         </IconButton>
+                        {(cv.documentType === 'cv' || !cv.documentType) && (
                         <IconButton
                           size="small"
                           onClick={() => handleDownloadDOCX(cv)}
@@ -443,6 +444,7 @@ const Dashboard = () => {
                         >
                           <DescriptionIcon fontSize="small" />
                         </IconButton>
+                        )}
                       </CardActions>
                     </Card>
                   </Grid>
