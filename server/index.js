@@ -15,10 +15,9 @@ if (!fs.existsSync(uploadsDir)) {
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middleware - increase limit for base64 images (e.g. photo in CV)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -36,6 +35,15 @@ pool.getConnection()
   .then(connection => {
     console.log('MySQL connected successfully');
     connection.release();
+    // Ensure cvs table has template and customization columns (for existing DBs)
+    return pool.execute("SHOW COLUMNS FROM cvs LIKE 'template'");
+  })
+  .then(([cols]) => {
+    if (cols && cols.length === 0) {
+      return pool.execute("ALTER TABLE cvs ADD COLUMN template VARCHAR(255) DEFAULT 'ats-simple' AFTER title")
+        .then(() => pool.execute('ALTER TABLE cvs ADD COLUMN customization JSON AFTER template'))
+        .then(() => console.log('Added template and customization columns to cvs table'));
+    }
   })
   .catch(err => {
     console.error('MySQL connection error:', err.message);

@@ -13,17 +13,21 @@ class CV {
       skills = [],
       certifications = [],
       languages = [],
-      projects = []
+      projects = [],
+      template = 'ats-simple',
+      customization
     } = cvData;
 
     const [result] = await pool.execute(
       `INSERT INTO cvs 
-       (userId, title, personalInfo, professionalSummary, workExperience, 
+       (userId, title, template, customization, personalInfo, professionalSummary, workExperience, 
         education, skills, certifications, languages, projects) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId,
         title,
+        template || 'ats-simple',
+        customization ? JSON.stringify(customization) : null,
         JSON.stringify(personalInfo || {}),
         professionalSummary,
         JSON.stringify(workExperience),
@@ -87,7 +91,9 @@ class CV {
       skills,
       certifications,
       languages,
-      projects
+      projects,
+      template,
+      customization
     } = updateData;
 
     const updates = [];
@@ -96,6 +102,14 @@ class CV {
     if (title !== undefined) {
       updates.push('title = ?');
       values.push(title);
+    }
+    if (template !== undefined) {
+      updates.push('template = ?');
+      values.push(template);
+    }
+    if (customization !== undefined) {
+      updates.push('customization = ?');
+      values.push(JSON.stringify(customization));
     }
     if (personalInfo !== undefined) {
       updates.push('personalInfo = ?');
@@ -162,6 +176,8 @@ class CV {
       userId: row.userId,
       title: row.title,
       documentType: row.document_type || 'cv',
+      template: row.template || 'ats-simple',
+      customization: row.customization ? (typeof row.customization === 'string' ? JSON.parse(row.customization) : row.customization) : null,
       personalInfo: typeof row.personalInfo === 'string' ? JSON.parse(row.personalInfo) : row.personalInfo,
       professionalSummary: row.professionalSummary,
       workExperience: typeof row.workExperience === 'string' ? JSON.parse(row.workExperience) : row.workExperience,

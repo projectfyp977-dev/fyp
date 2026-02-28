@@ -37,7 +37,7 @@ const fonts = [
   'Source Sans Pro',
 ];
 
-const CVCustomization = ({ customization, onChange }) => {
+const CVCustomization = ({ customization, onChange, documentType = 'cv' }) => {
   const [localCustomization, setLocalCustomization] = useState(customization || {
     fontFamily: 'Inter',
     fontSize: 14,
@@ -233,7 +233,8 @@ const CVCustomization = ({ customization, onChange }) => {
         </AccordionDetails>
       </Accordion>
 
-      {/* Section Control */}
+      {/* Section Control - only for CV */}
+      {documentType === 'cv' && (
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="subtitle1" fontWeight={600}>
@@ -270,6 +271,7 @@ const CVCustomization = ({ customization, onChange }) => {
           </Box>
         </AccordionDetails>
       </Accordion>
+      )}
 
       {/* Additional Customization Options */}
       <Accordion>

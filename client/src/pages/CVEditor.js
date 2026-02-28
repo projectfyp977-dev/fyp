@@ -32,7 +32,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import axios from 'axios';
 import VoiceInput from '../components/VoiceInput';
-import AISuggestions from '../components/AISuggestions';
 import ATSScoreChecker from '../components/ATSScoreChecker';
 import CVTemplateSelector from '../components/CVTemplateSelector';
 import CVPreview from '../components/CVPreview';
@@ -165,36 +164,28 @@ const CVEditor = () => {
         setTemplate(cvData.template);
       }
       if (cvData.customization) {
-        setCustomization({
-          fontFamily: 'Inter',
-          fontSize: 14,
-          headingFontSize: 18,
-          headingColor: '#6366f1',
-          textColor: '#1e293b',
-          layout: 'single-column',
-          lineSpacing: 1.5,
-          margins: 20,
-          sectionSpacing: 24,
-          showIcons: true,
-          showDividers: true,
-          compactMode: false,
-          showPhoto: true,
-          headerAlignment: 'left',
-          textAlignment: 'left',
-          boldHeadings: true,
-          uppercaseHeadings: false,
-          sections: {
-            professionalSummary: { enabled: true, title: 'Professional Summary' },
-            workExperience: { enabled: true, title: 'Work Experience' },
-            education: { enabled: true, title: 'Education' },
-            skills: { enabled: true, title: 'Skills' },
-            certifications: { enabled: true, title: 'Certifications' },
-            languages: { enabled: true, title: 'Languages' },
-            projects: { enabled: true, title: 'Projects' },
-            hobbies: { enabled: true, title: 'Hobbies & Interests' },
-          },
+        setCustomization(prev => ({
+          ...prev,
+          fontFamily: prev.fontFamily || 'Inter',
+          fontSize: prev.fontSize || 14,
+          headingFontSize: prev.headingFontSize || 18,
+          headingColor: prev.headingColor || '#6366f1',
+          textColor: prev.textColor || '#1e293b',
+          layout: prev.layout || 'single-column',
+          lineSpacing: prev.lineSpacing || 1.5,
+          margins: prev.margins || 20,
+          sectionSpacing: prev.sectionSpacing || 24,
+          showIcons: prev.showIcons !== false,
+          showDividers: prev.showDividers !== false,
+          compactMode: prev.compactMode === true,
+          showPhoto: prev.showPhoto !== false,
+          headerAlignment: prev.headerAlignment || 'left',
+          textAlignment: prev.textAlignment || 'left',
+          boldHeadings: prev.boldHeadings !== false,
+          uppercaseHeadings: prev.uppercaseHeadings === true,
+          sections: { ...prev.sections, ...(cvData.customization.sections || {}) },
           ...cvData.customization,
-        });
+        }));
       }
     } catch (error) {
       console.error('Error fetching CV:', error);
@@ -483,6 +474,16 @@ const CVEditor = () => {
                         />
                       </Grid>
                     )}
+                    {(documentType === 'visiting-card' || documentType === 'poster') && (
+                      <Grid item xs={12} sm={6}>
+                        <VoiceInput
+                          label="Address"
+                          value={cv.personalInfo.address}
+                          onChange={(value) => updateField('personalInfo.address', value)}
+                          placeholder="Street, City, State, ZIP"
+                        />
+                      </Grid>
+                    )}
                     {documentType === 'cv' && (
                       <Grid item xs={12} sm={6}>
                         <VoiceInput
@@ -570,7 +571,6 @@ const CVEditor = () => {
                     multiline
                     rows={documentType === 'visiting-card' ? 2 : 4}
                   />
-                  {documentType === 'cv' && <AISuggestions text={cv.professionalSummary} context="professional summary" />}
                 </AccordionDetails>
               </Accordion>
               )}
@@ -1193,9 +1193,8 @@ const CVEditor = () => {
 
           <Grid item xs={12} md={4}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <CVCustomization customization={customization} onChange={setCustomization} />
+              <CVCustomization customization={customization} onChange={setCustomization} documentType={documentType} />
               <ATSScoreChecker cvContent={cv} />
-              <AISuggestions cvContent={cv} />
             </Box>
           </Grid>
         </Grid>

@@ -48,6 +48,8 @@ async function setupDatabase() {
         userId INT NOT NULL,
         title VARCHAR(255) DEFAULT 'My CV',
         document_type VARCHAR(50) DEFAULT 'cv',
+        template VARCHAR(255) DEFAULT 'ats-simple',
+        customization JSON,
         personalInfo JSON,
         professionalSummary TEXT,
         workExperience JSON,
@@ -63,6 +65,16 @@ async function setupDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
     console.log('CVs table created or already exists');
+
+    // Add template/customization columns if table already existed without them
+    try {
+      const [cols] = await connection.query("SHOW COLUMNS FROM cvs LIKE 'template'");
+      if (cols.length === 0) {
+        await connection.query("ALTER TABLE cvs ADD COLUMN template VARCHAR(255) DEFAULT 'ats-simple' AFTER document_type");
+        await connection.query('ALTER TABLE cvs ADD COLUMN customization JSON AFTER template');
+        console.log('Added template and customization columns to cvs table');
+      }
+    } catch (e) { /* ignore */ }
 
     console.log('\n✅ Database setup completed successfully!');
   } catch (error) {

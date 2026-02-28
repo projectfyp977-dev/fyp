@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS cvs (
   userId INT NOT NULL,
   title VARCHAR(255) DEFAULT 'My CV',
   document_type VARCHAR(50) DEFAULT 'cv',
+  template VARCHAR(255) DEFAULT 'ats-simple',
+  customization JSON,
   personalInfo JSON,
   professionalSummary TEXT,
   workExperience JSON,
