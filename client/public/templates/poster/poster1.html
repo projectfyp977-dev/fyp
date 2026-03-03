@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Poster</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #a67352; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
+    .poster { width: 21cm; height: 29.7cm; background: linear-gradient(135deg, #e0b492 0%, #d1a180 100%); position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; padding: 3cm 2.5cm; display: flex; flex-direction: column; align-items: center; justify-content: space-between; color: white; text-align: center; }
+    .logo { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5cm; color: #fff; opacity: 0.9; }
+    .title { font-size: 3.5rem; line-height: 1.1; font-weight: 800; text-transform: uppercase; margin-bottom: 1cm; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+    .title span { color: #f5e6cc; display: block; }
+    .photo-frame { position: relative; width: 12cm; height: 12cm; border-radius: 50%; background: #f5e6cc; display: flex; align-items: center; justify-content: center; margin: 0 auto 1cm; overflow: hidden; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+    .photo-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .content { max-width: 15cm; margin: 0 auto; }
+    .content p { font-size: 0.9rem; line-height: 1.5; margin-bottom: 0.8cm; color: #5c4033; font-weight: 500; }
+    .website { font-size: 0.9rem; color: #5c4033; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="poster">
+    <div class="logo">{{company}}</div>
+    <div class="title"><span>{{fullName}}</span>{{title}}</div>
+    <div class="photo-frame">
+      <img src="{{photo}}" alt="" onerror="this.style.display='none'"/>
+    </div>
+    <div class="content">
+      <p>{{body}}</p>
+      <div class="website">{{website}}</div>
+    </div>
+  </div>
+</body>
+</html>

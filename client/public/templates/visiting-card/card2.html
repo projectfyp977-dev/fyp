@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Card Design 2</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { min-height: 100vh; background: #2a3039; padding: 4rem 1rem; display: flex; flex-direction: column; gap: 4rem; align-items: center; }
+        :root { --dark: #212730; --light-gray: #e2e2e2; }
+        .chevron-pattern-dark { background-image: repeating-linear-gradient(45deg, #2a3039 0px, #2a3039 4px, transparent 4px, transparent 12px); background-size: 100% 24px; }
+        .chevron-pattern-light { background-image: repeating-linear-gradient(45deg, #f1f1f1 0px, #f1f1f1 4px, transparent 4px, transparent 12px); background-size: 100% 24px; }
+        .business-card { width: 100%; max-width: 850px; aspect-ratio: 3.5 / 2; box-shadow: 0 18px 35px rgba(0,0,0,0.2); position: relative; padding: 2rem; overflow: hidden; }
+        .card-dark { background-color: var(--dark); color: white; }
+        .card-front-dark-content { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .hex-logo { width: 80px; margin-bottom: 1.4rem; opacity: 0.7; }
+        .company-name { font-size: 2.7rem; font-weight: 300; margin-bottom: 0.5rem; }
+        .company-name span { font-weight: 700; }
+        .company-tagline { opacity: 0.6; margin-bottom: 4rem; }
+        .website-divider-row { position: absolute; bottom: 24px; width: calc(100% - 4rem); display: flex; align-items: center; gap: 1rem; opacity: 0.7; font-size: 1.1rem; }
+        .website-divider-row::before, .website-divider-row::after { content: ''; flex-grow: 1; height: 1px; background-color: white; opacity: 0.5; }
+        .card-white { background-color: white; color: var(--dark); }
+        .card-back-white-content { height: 100%; display: grid; grid-template-columns: 1fr 1fr; align-items: center; }
+        .person-name-side { padding-right: 3rem; }
+        .person-name-side h2 { font-size: 2.4rem; font-weight: 300; margin-bottom: 0.4rem; }
+        .person-name-side h2 span { font-weight: 700; }
+        .person-name-side p { opacity: 0.7; font-size: 1.1rem; }
+        .contact-side-dark { padding-left: 3rem; display: flex; flex-direction: column; gap: 1.4rem; border-left: 1px solid #eee; }
+        .contact-item-dark { display: flex; align-items: flex-start; gap: 1.2rem; font-size: 1.15rem; font-weight: 600; opacity: 0.8; }
+        .contact-item-dark svg { width: 28px; fill: var(--dark); opacity: 0.6; flex-shrink: 0; margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <div class="business-card card-dark chevron-pattern-dark">
+        <div class="card-front-dark-content">
+            <svg class="hex-logo" viewBox="0 0 120 120" fill="none"><path d="M60 6 L106 33 L106 87 L60 114 L14 87 L14 33 L60 6Z" stroke="white" stroke-width="3"/></svg>
+            <h1 class="company-name">{{company}}</h1>
+            <p class="company-tagline">{{tagline}}</p>
+        </div>
+        <div class="website-divider-row">{{website}}</div>
+    </div>
+    <div class="business-card card-white chevron-pattern-light">
+        <div class="card-back-white-content">
+            <div class="person-name-side">
+                <h2>{{fullName}}</h2>
+                <p>{{jobTitle}}</p>
+            </div>
+            <div class="contact-side-dark">
+                <div class="contact-item-dark"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><div>{{email}}</div></div>
+                <div class="contact-item-dark"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><div>{{phone}}</div></div>
+                <div class="contact-item-dark"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><div>{{address}}</div></div>
+                <div class="contact-item-dark"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg><div>{{website}}</div></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -17,6 +17,8 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { exportCVToPDF } from '../utils/pdfExport';
 import { exportCVToDOCX } from '../utils/docxExport';
+import { getTemplatePath } from '../config/templates';
+import HTMLTemplatePreview from './HTMLTemplatePreview';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -40,6 +42,15 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
   const documentType = cv.documentType || 'cv';
 
   const renderTemplate = () => {
+    if (documentType === 'visiting-card' && getTemplatePath('visiting-card', currentTemplate)) {
+      return <HTMLTemplatePreview documentType="visiting-card" templateId={currentTemplate} cv={cv} customization={currentCustomization} />;
+    }
+    if (documentType === 'poster' && getTemplatePath('poster', currentTemplate)) {
+      return <HTMLTemplatePreview documentType="poster" templateId={currentTemplate} cv={cv} customization={currentCustomization} />;
+    }
+    if (documentType === 'biographics' && getTemplatePath('biographics', currentTemplate)) {
+      return <HTMLTemplatePreview documentType="biographics" templateId={currentTemplate} cv={cv} customization={currentCustomization} />;
+    }
     if (documentType === 'visiting-card') {
       return <VisitingCardTemplate cv={cv} customization={currentCustomization} templateId={currentTemplate} />;
     }

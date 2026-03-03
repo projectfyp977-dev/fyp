@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flyer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #c7b2a1; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Georgia', serif; padding: 20px; }
+    .flyer { width: 21cm; height: 29.7cm; background: #fdf6ee; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; padding: 2.5cm 2cm; display: flex; flex-direction: column; align-items: center; color: #5d4a40; }
+    .title-section { text-align: center; margin-bottom: 1cm; }
+    .title { font-size: 3rem; font-weight: bold; letter-spacing: 1px; margin-bottom: 0.2cm; }
+    .subtitle { font-size: 1.2rem; font-weight: 300; font-style: italic; }
+    .image-frame { width: 12cm; height: 14cm; margin: 0 auto 1cm; overflow: hidden; border-radius: 0 0 50% 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .image-frame img { width: 100%; height: 100%; object-fit: cover; }
+    .content-section { text-align: center; max-width: 15cm; margin: 0 auto; }
+    .paragraph { font-size: 0.8rem; line-height: 1.5; color: #7a6b60; margin-bottom: 1cm; }
+  </style>
+</head>
+<body>
+  <div class="flyer">
+    <div class="title-section">
+      <h1 class="title">{{title}}</h1>
+      <p class="subtitle">{{subtitle}}</p>
+    </div>
+    <div class="image-frame">
+      <img src="{{photo}}" alt="" onerror="this.style.display='none'"/>
+    </div>
+    <div class="content-section">
+      <p class="paragraph">{{body}}</p>
+    </div>
+  </div>
+</body>
+</html>

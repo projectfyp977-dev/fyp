@@ -14,6 +14,21 @@ import {
   Tab,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { TEMPLATE_CONFIG } from '../config/templates';
+
+function buildTemplateListFromConfig(documentType) {
+  const config = TEMPLATE_CONFIG[documentType];
+  if (!config) return null;
+  const colors = documentType === 'visiting-card' ? ['#059669', '#2563eb', '#7c3aed'] : documentType === 'poster' ? ['#dc2626', '#ea580c', '#4f46e5'] : ['#0f766e', '#7c3aed', '#2563eb'];
+  return Object.entries(config).map(([id, meta], i) => ({
+    id,
+    name: meta.name,
+    description: `${meta.name} template`,
+    category: 'Template',
+    color: colors[i % colors.length],
+    preview: id,
+  }));
+}
 
 const templates = {
   all: [
@@ -26,20 +41,20 @@ const templates = {
     { id: 'ats-sidebar', name: 'ATS Sidebar', description: 'Left sidebar for contact & skills, ATS-safe structure', category: 'ATS', color: '#2563eb', preview: 'ats-sidebar' },
     { id: 'ats-card', name: 'ATS Card', description: 'Section cards with clear headings for ATS parsing', category: 'ATS', color: '#7c3aed', preview: 'ats-card' },
   ],
-  'visiting-card': [
-    { id: 'vc-minimal', name: 'ATS Minimal Card', description: 'Clean, ATS-friendly visiting card', category: 'ATS', color: '#059669', preview: 'vc-minimal' },
-    { id: 'vc-professional', name: 'ATS Professional', description: 'Professional layout for business cards', category: 'ATS', color: '#2563eb', preview: 'vc-professional' },
-    { id: 'vc-modern', name: 'ATS Modern', description: 'Modern design with clear structure', category: 'ATS', color: '#7c3aed', preview: 'vc-modern' },
+  'visiting-card': buildTemplateListFromConfig('visiting-card') || [
+    { id: 'card1', name: 'Card 1', description: 'Visiting card template 1', category: 'Template', color: '#059669', preview: 'card1' },
+    { id: 'card2', name: 'Card 2', description: 'Visiting card template 2', category: 'Template', color: '#2563eb', preview: 'card2' },
+    { id: 'card3', name: 'Card 3', description: 'Visiting card template 3', category: 'Template', color: '#7c3aed', preview: 'card3' },
   ],
-  poster: [
-    { id: 'poster-ats-clean', name: 'ATS Clean Poster', description: 'Clean, ATS-optimized poster layout', category: 'ATS', color: '#dc2626', preview: 'poster-clean' },
-    { id: 'poster-ats-bold', name: 'ATS Bold Poster', description: 'Bold sections for easy parsing', category: 'ATS', color: '#ea580c', preview: 'poster-bold' },
-    { id: 'poster-ats-elegant', name: 'ATS Elegant', description: 'Elegant poster with ATS structure', category: 'ATS', color: '#4f46e5', preview: 'poster-elegant' },
+  poster: buildTemplateListFromConfig('poster') || [
+    { id: 'poster1', name: 'Poster 1', description: 'Poster template 1', category: 'Template', color: '#dc2626', preview: 'poster1' },
+    { id: 'poster2', name: 'Poster 2', description: 'Poster template 2', category: 'Template', color: '#ea580c', preview: 'poster2' },
+    { id: 'poster3', name: 'Poster 3', description: 'Poster template 3', category: 'Template', color: '#4f46e5', preview: 'poster3' },
   ],
-  biographics: [
-    { id: 'bio-ats-simple', name: 'ATS Simple Bio', description: 'Clean biography layout', category: 'ATS', color: '#0f766e', preview: 'ats-simple' },
-    { id: 'bio-ats-narrative', name: 'ATS Narrative', description: 'Story-style with clear sections', category: 'ATS', color: '#7c3aed', preview: 'ats-sidebar' },
-    { id: 'bio-ats-card', name: 'ATS Bio Card', description: 'Card-style biography', category: 'ATS', color: '#2563eb', preview: 'ats-card' },
+  biographics: buildTemplateListFromConfig('biographics') || [
+    { id: 'bio1', name: 'Bio 1', description: 'Biographics template 1', category: 'Template', color: '#0f766e', preview: 'bio1' },
+    { id: 'bio2', name: 'Bio 2', description: 'Biographics template 2', category: 'Template', color: '#7c3aed', preview: 'bio2' },
+    { id: 'bio3', name: 'Bio 3', description: 'Biographics template 3', category: 'Template', color: '#2563eb', preview: 'bio3' },
   ],
 };
 
@@ -93,6 +108,69 @@ const TemplatePreview = ({ template }) => {
         <Box sx={{ width: 50, height: 50, borderRadius: '50%', bgcolor: 'white', mx: 'auto' }} />
         <Box sx={{ width: '90%', height: 4, bgcolor: 'white', borderRadius: 1, mx: 'auto' }} />
         <Box sx={{ width: '70%', height: 3, bgcolor: 'rgba(255,255,255,0.8)', borderRadius: 1, mx: 'auto' }} />
+      </Box>
+    ),
+    card1: (
+      <Box sx={{ p: 1.5, bgcolor: '#059669', borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1 }}>
+        <Box sx={{ width: 50, height: 50, borderRadius: '50%', bgcolor: 'white', mx: 'auto' }} />
+        <Box sx={{ width: '90%', height: 4, bgcolor: 'white', borderRadius: 1, mx: 'auto' }} />
+        <Box sx={{ width: '70%', height: 3, bgcolor: 'rgba(255,255,255,0.8)', borderRadius: 1, mx: 'auto' }} />
+      </Box>
+    ),
+    card2: (
+      <Box sx={{ p: 1.5, bgcolor: '#2563eb', borderRadius: 2, height: '100%', display: 'flex', gap: 1 }}>
+        <Box sx={{ width: 40, height: 40, bgcolor: 'white', borderRadius: 1 }} />
+        <Box sx={{ flex: 1 }}>
+          <Box sx={{ width: '100%', height: 4, bgcolor: 'white', borderRadius: 1, mb: 0.5 }} />
+          <Box sx={{ width: '80%', height: 3, bgcolor: 'rgba(255,255,255,0.8)', borderRadius: 1 }} />
+        </Box>
+      </Box>
+    ),
+    card3: (
+      <Box sx={{ p: 1.5, borderRadius: 2, height: '100%', background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1 }}>
+        <Box sx={{ width: '85%', height: 5, bgcolor: 'white', borderRadius: 1, mx: 'auto' }} />
+        <Box sx={{ width: '60%', height: 3, bgcolor: 'rgba(255,255,255,0.9)', borderRadius: 1, mx: 'auto' }} />
+      </Box>
+    ),
+    poster1: (
+      <Box sx={{ p: 1.5, bgcolor: '#e0b492', borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box sx={{ width: '100%', height: 8, bgcolor: 'rgba(255,255,255,0.9)', borderRadius: 1, mb: 1 }} />
+        <Box sx={{ width: 60, height: 60, borderRadius: '50%', bgcolor: '#f5e6cc', mx: 'auto' }} />
+        <Box sx={{ width: '90%', height: 3, bgcolor: 'rgba(255,255,255,0.7)', borderRadius: 1, mx: 'auto' }} />
+      </Box>
+    ),
+    poster2: (
+      <Box sx={{ p: 1.5, bgcolor: '#0d4a4a', borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box sx={{ width: '80%', height: 5, bgcolor: 'rgba(255,255,255,0.9)', borderRadius: 1 }} />
+        <Box sx={{ width: '60%', height: 3, bgcolor: 'rgba(255,255,255,0.6)', borderRadius: 1 }} />
+      </Box>
+    ),
+    poster3: (
+      <Box sx={{ p: 1.5, bgcolor: '#fdf6ee', borderRadius: 2, height: '100%', border: '1px solid #e8d5c8' }}>
+        <Box sx={{ width: '70%', height: 6, bgcolor: '#5d4a40', borderRadius: 1, mx: 'auto', mb: 1 }} />
+        <Box sx={{ width: 80, height: 60, borderRadius: '0 0 50% 50%', bgcolor: '#e8d5c8', mx: 'auto', mb: 1 }} />
+        <Box sx={{ width: '100%', height: 2, bgcolor: '#e8d5c8', borderRadius: 1 }} />
+      </Box>
+    ),
+    bio1: (
+      <Box sx={{ p: 1.5, bgcolor: '#a8d5d5', borderRadius: 2, height: '100%' }}>
+        <Box sx={{ width: '80%', height: 4, bgcolor: '#333', borderRadius: 1, mb: 1 }} />
+        <Box sx={{ width: '100%', height: 3, bgcolor: 'rgba(0,0,0,0.1)', borderRadius: 1, mb: 0.5 }} />
+        <Box sx={{ width: '90%', height: 3, bgcolor: 'rgba(0,0,0,0.1)', borderRadius: 1 }} />
+      </Box>
+    ),
+    bio2: (
+      <Box sx={{ p: 1.5, bgcolor: 'white', borderRadius: 2, height: '100%', border: '1px solid #e5e7eb' }}>
+        <Box sx={{ width: '60%', height: 4, bgcolor: '#222', borderRadius: 1, mb: 1 }} />
+        <Box sx={{ width: '100%', height: 2, bgcolor: '#e5e7eb', mb: 0.5 }} />
+        <Box sx={{ width: '90%', height: 3, bgcolor: '#f1f5f9', borderRadius: 1 }} />
+      </Box>
+    ),
+    bio3: (
+      <Box sx={{ p: 1.5, bgcolor: 'white', borderRadius: 2, height: '100%', border: '2px solid #00bfa5' }}>
+        <Box sx={{ width: 50, height: 50, borderRadius: '50%', border: '2px solid #00bfa5', mb: 1 }} />
+        <Box sx={{ width: '80%', height: 4, bgcolor: '#333', borderRadius: 1, mb: 0.5 }} />
+        <Box sx={{ width: '100%', height: 2, bgcolor: '#00bfa5' }} />
       </Box>
     ),
     'vc-professional': (

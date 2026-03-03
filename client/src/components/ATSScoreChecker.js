@@ -24,7 +24,15 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { getApiUrl } from '../utils/apiUrl';
 import axios from 'axios';
 
-const ATSScoreChecker = ({ cvContent }) => {
+const ATSScoreChecker = ({ cvContent, documentType = 'cv' }) => {
+  const title = documentType === 'cv' ? 'ATS Score Checker' : documentType === 'visiting-card' ? 'Visiting Card ATS' : documentType === 'poster' ? 'Poster ATS' : 'Biographics ATS';
+  const description = documentType === 'cv'
+    ? "Check your CV's compatibility with Applicant Tracking Systems (ATS). Get a score and specific improvement suggestions."
+    : documentType === 'visiting-card'
+    ? 'Check your visiting card for clarity and contact completeness.'
+    : documentType === 'poster'
+    ? 'Check your poster for readability and impact.'
+    : 'Check your biographics for clarity and structure.';
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState(null);
   const [error, setError] = useState('');
@@ -107,12 +115,12 @@ const ATSScoreChecker = ({ cvContent }) => {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
         <AssessmentIcon sx={{ color: 'primary.main' }} />
         <Typography variant="h6" fontWeight={600}>
-          ATS Score Checker
+          {title}
         </Typography>
       </Box>
       
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Check your CV's compatibility with Applicant Tracking Systems (ATS). Get a score and specific improvement suggestions.
+        {description}
       </Typography>
 
       {error && (

@@ -41,6 +41,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import { getApiUrl } from '../utils/apiUrl';
+import { getFieldsForTemplate } from '../config/templates';
 
 const CVEditor = () => {
   const { id } = useParams();
@@ -49,9 +50,9 @@ const CVEditor = () => {
   const documentTypeFromState = location.state?.documentType || 'cv';
   const defaultTemplateByType = {
     cv: 'ats-simple',
-    'visiting-card': 'vc-minimal',
-    poster: 'poster-ats-clean',
-    biographics: 'bio-ats-simple',
+    'visiting-card': 'card1',
+    poster: 'poster1',
+    biographics: 'bio1',
   };
   const [documentType, setDocumentType] = useState(documentTypeFromState);
   const [loading, setLoading] = useState(!!id);
@@ -93,7 +94,7 @@ const CVEditor = () => {
   const [cv, setCv] = useState({
     title: documentTypeFromState === 'cv' ? 'My CV' : documentTypeFromState === 'visiting-card' ? 'My Visiting Card' : documentTypeFromState === 'poster' ? 'My Poster' : 'My Biographics',
     documentType: documentTypeFromState,
-    template: 'ats-simple',
+    template: documentTypeFromState === 'cv' ? 'ats-simple' : documentTypeFromState === 'visiting-card' ? 'card1' : documentTypeFromState === 'poster' ? 'poster1' : 'bio1',
     customization: {
       fontFamily: 'Inter',
       fontSize: 14,
@@ -336,6 +337,9 @@ const CVEditor = () => {
     }
   };
 
+  const templateFields = documentType !== 'cv' && template ? getFieldsForTemplate(documentType, template) : null;
+  const showField = (name) => !templateFields || templateFields.length === 0 || templateFields.includes(name);
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
     <Box>
@@ -413,6 +417,7 @@ const CVEditor = () => {
                 borderColor: 'divider',
               }}
             >
+              {(documentType === 'cv' || showField('title')) && (
               <TextField
                 fullWidth
                 label={documentType === 'cv' ? 'CV Title' : documentType === 'visiting-card' ? 'Visiting Card Title' : documentType === 'poster' ? 'Poster Title' : 'Biographics Title'}
@@ -420,13 +425,16 @@ const CVEditor = () => {
                 onChange={(e) => updateField('title', e.target.value)}
                 margin="normal"
               />
+              )}
 
+              {(documentType === 'cv' || templateFields === null || templateFields.some(f => ['fullName','jobTitle','company','email','phone','address','website','photo'].includes(f))) && (
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography variant="h6">Personal Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={2}>
+                    {(documentType === 'cv' || showField('fullName')) && (
                     <Grid item xs={12} sm={6}>
                       <VoiceInput
                         label="Full Name"
@@ -434,6 +442,8 @@ const CVEditor = () => {
                         onChange={(value) => updateField('personalInfo.fullName', value)}
                       />
                     </Grid>
+                    )}
+                    {(documentType === 'cv' || showField('jobTitle')) && (
                     <Grid item xs={12} sm={6}>
                       <VoiceInput
                         label="Job Title / Designation"
@@ -442,7 +452,8 @@ const CVEditor = () => {
                         placeholder="e.g. Software Engineer, CMS Developer, Designer"
                       />
                     </Grid>
-                    {(documentType === 'visiting-card' || documentType === 'poster') && (
+                    )}
+                    {(documentType === 'cv' || documentType === 'visiting-card' || documentType === 'poster') && showField('company') && (
                       <Grid item xs={12} sm={6}>
                         <VoiceInput
                           label="Company / Brand"
@@ -451,6 +462,7 @@ const CVEditor = () => {
                         />
                       </Grid>
                     )}
+                    {(documentType === 'cv' || showField('email')) && (
                     <Grid item xs={12} sm={6}>
                       <VoiceInput
                         label="Email"
@@ -458,6 +470,8 @@ const CVEditor = () => {
                         onChange={(value) => updateField('personalInfo.email', value)}
                       />
                     </Grid>
+                    )}
+                    {(documentType === 'cv' || showField('phone')) && (
                     <Grid item xs={12} sm={6}>
                       <VoiceInput
                         label="Phone"
@@ -465,6 +479,7 @@ const CVEditor = () => {
                         onChange={(value) => updateField('personalInfo.phone', value)}
                       />
                     </Grid>
+                    )}
                     {documentType === 'cv' && (
                       <Grid item xs={12} sm={6}>
                         <VoiceInput
@@ -474,13 +489,22 @@ const CVEditor = () => {
                         />
                       </Grid>
                     )}
-                    {(documentType === 'visiting-card' || documentType === 'poster') && (
+                    {(documentType === 'visiting-card' || documentType === 'poster') && showField('address') && (
                       <Grid item xs={12} sm={6}>
                         <VoiceInput
                           label="Address"
                           value={cv.personalInfo.address}
                           onChange={(value) => updateField('personalInfo.address', value)}
                           placeholder="Street, City, State, ZIP"
+                        />
+                      </Grid>
+                    )}
+                    {documentType === 'biographics' && showField('address') && (
+                      <Grid item xs={12} sm={6}>
+                        <VoiceInput
+                          label="Address"
+                          value={cv.personalInfo.address}
+                          onChange={(value) => updateField('personalInfo.address', value)}
                         />
                       </Grid>
                     )}
@@ -493,6 +517,7 @@ const CVEditor = () => {
                         />
                       </Grid>
                     )}
+                    {(documentType === 'cv' || showField('website')) && (
                     <Grid item xs={12} sm={6}>
                       <VoiceInput
                         label="Website"
@@ -500,6 +525,7 @@ const CVEditor = () => {
                         onChange={(value) => updateField('personalInfo.website', value)}
                       />
                     </Grid>
+                    )}
                     {documentType === 'cv' && (
                       <Grid item xs={12} sm={6}>
                         <VoiceInput
@@ -509,6 +535,7 @@ const CVEditor = () => {
                         />
                       </Grid>
                     )}
+                    {(documentType === 'cv' || showField('photo')) && (
                     <Grid item xs={12}>
                       <Box sx={{ mt: 2 }}>
                         <Typography variant="subtitle2" gutterBottom>
@@ -552,11 +579,13 @@ const CVEditor = () => {
                         )}
                       </Box>
                     </Grid>
+                    )}
                   </Grid>
                 </AccordionDetails>
               </Accordion>
+              )}
 
-              {(documentType === 'cv' || documentType === 'visiting-card' || documentType === 'poster' || documentType === 'biographics') && (
+              {(documentType === 'cv' || showField('tagline') || showField('body') || showField('headline') || showField('subhead')) && (
               <Accordion defaultExpanded={documentType !== 'cv'}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography variant="h6">
@@ -1194,7 +1223,7 @@ const CVEditor = () => {
           <Grid item xs={12} md={4}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <CVCustomization customization={customization} onChange={setCustomization} documentType={documentType} />
-              <ATSScoreChecker cvContent={cv} />
+              <ATSScoreChecker cvContent={cv} documentType={documentType} />
             </Box>
           </Grid>
         </Grid>

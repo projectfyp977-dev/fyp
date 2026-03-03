@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Card Design 1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { min-height: 100vh; background: linear-gradient(135deg, #fff 50%, #cccccc 50%); padding: 4rem 1rem; display: flex; flex-direction: column; gap: 4rem; align-items: center; }
+        :root { --cyan: #13bde8; --dark-navy: #001729; --text-dark: #222222; }
+        .business-card { width: 100%; max-width: 900px; aspect-ratio: 3.5 / 2; background: white; border-radius: 32px; box-shadow: 0 22px 45px rgba(0,0,0,0.22); position: relative; padding: 2rem; overflow: hidden; }
+        .card-bar-top { position: absolute; top: 0; left: 0; width: 100%; height: 48px; background-color: var(--cyan); clip-path: polygon(14% 0, 86% 0, 79% 100%, 21% 100%); }
+        .card-bar-bottom { position: absolute; bottom: 0; left: 0; width: 100%; height: 24px; background-color: var(--dark-navy); clip-path: polygon(14% 0, 86% 0, 79% 100%, 21% 100%); }
+        .card-front-content { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .logo-1 { width: 110px; margin-bottom: 1.2rem; }
+        .brand-name { font-size: 2.8rem; font-weight: 900; color: var(--text-dark); letter-spacing: 2px; line-height: 1; margin-bottom: 0.3rem; }
+        .tagline { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; opacity: 0.8; }
+        .card-back-content { height: 100%; display: grid; grid-template-columns: 1fr 1fr; align-items: center; }
+        .divider-line { position: absolute; left: 50%; top: 20%; bottom: 20%; width: 1px; background: #eee; box-shadow: 1px 0 10px rgba(0,0,0,0.15); }
+        .name-side { text-align: center; }
+        .name-side h2 { font-size: 3rem; font-weight: 700; color: var(--cyan); text-transform: uppercase; letter-spacing: 4px; line-height: 1; margin-bottom: 0.5rem; }
+        .name-side p { font-size: 1.6rem; font-weight: 500; color: var(--text-dark); }
+        .contact-side { padding-left: 3rem; display: flex; flex-direction: column; gap: 0.85rem; }
+        .contact-item { display: flex; align-items: center; gap: 0.8rem; font-size: 1.2rem; color: var(--text-dark); }
+        .contact-item svg { width: 36px; height: 36px; stroke: var(--dark-navy); fill: transparent; stroke-width: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="business-card">
+        <div class="card-bar-top"></div>
+        <div class="card-bar-bottom"></div>
+        <div class="card-front-content">
+            <svg class="logo-1" viewBox="0 0 120 120" fill="none"><path d="M60 6 L114 60 L60 114 L6 60 L60 6Z" stroke="#13bde8" stroke-width="10" fill="white"/><path d="M26 60 L60 26 L94 60" stroke="#13bde8" stroke-width="10" stroke-linecap="round"/></svg>
+            <h1 class="brand-name">{{company}}</h1>
+            <p class="tagline">{{tagline}}</p>
+        </div>
+    </div>
+    <div class="business-card">
+        <div class="card-bar-top"></div>
+        <div class="card-bar-bottom"></div>
+        <div class="divider-line"></div>
+        <div class="card-back-content">
+            <div class="name-side">
+                <h2>{{fullName}}</h2>
+                <p>{{jobTitle}}</p>
+            </div>
+            <div class="contact-side">
+                <div class="contact-item"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>{{address}}</span></div>
+                <div class="contact-item"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>{{phone}}</span></div>
+                <div class="contact-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span>{{email}}</span></div>
+                <div class="contact-item"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span>{{website}}</span></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

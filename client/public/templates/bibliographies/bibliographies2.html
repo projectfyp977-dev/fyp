@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Letterhead</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { margin: 0; padding: 40px; background-color: #e8ded6; font-family: 'Georgia', serif; display: flex; justify-content: center; }
+    .page-container { width: 210mm; min-height: 297mm; background-color: #fff; position: relative; padding: 40px 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .logo-text { font-size: 1.8rem; font-weight: bold; color: #222; margin-bottom: 5px; }
+    .logo-sub { font-size: 0.9rem; color: #222; margin-bottom: 20px; }
+    h2.headline { font-size: 1.5rem; color: #222; margin: 10px 0 30px 0; }
+    .body-text { font-size: 0.95rem; color: #444; line-height: 1.8; margin-bottom: 20px; }
+    .signature-area { margin-top: 50px; text-align: right; }
+    .name { font-weight: 700; font-size: 1.1rem; color: #222; }
+    .role { font-size: 0.9rem; color: #444; }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="logo-text">{{company}}</div>
+    <div class="logo-sub">Platform</div>
+    <h2 class="headline">{{title}}</h2>
+    <div class="body-text">{{body}}</div>
+    <div class="signature-area">
+      <div class="name">{{fullName}}</div>
+      <div class="role">{{jobTitle}}</div>
+    </div>
+  </div>
+</body>
+</html>
