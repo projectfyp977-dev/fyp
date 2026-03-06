@@ -28,7 +28,7 @@ const HTMLTemplatePreview = ({ documentType, templateId, cv, customization }) =>
         return res.text();
       })
       .then((text) => {
-        const values = getPlaceholderValues(cv);
+        const values = getPlaceholderValues(cv, templateId);
         let filled = text;
         Object.entries(values).forEach(([placeholder, value]) => {
           filled = filled.split(placeholder).join(value || '');
@@ -39,11 +39,13 @@ const HTMLTemplatePreview = ({ documentType, templateId, cv, customization }) =>
         const textColor = customization?.textColor;
         if (accent || bg || textColor) {
           const overrides = [
-            accent ? `--cyan: ${accent}; --dark-navy: ${accent}; --dark: ${accent}; --dark-teal: ${accent};` : '',
-            bg ? `background: ${bg};` : '',
-            textColor ? `--text-dark: ${textColor}; color: ${textColor};` : '',
+            accent ? `--cyan: ${accent}; --accent: ${accent}; --dark-navy: ${accent};` : '',
+            bg ? `--dark: ${bg}; --bg: ${bg}; --poster-bg: ${bg};` : '',
+            textColor ? `--text-dark: ${textColor};` : '',
           ].filter(Boolean).join(' ');
-          const styleBlock = `<style id="customization-override">:root { ${overrides} }</style>`;
+          const bodyOverrides = bg ? ` body { background: ${bg} !important; } .poster, .letterhead, .page-container, .flyer { background: ${bg} !important; }` : '';
+          const colorOverrides = textColor ? ` body, .poster, .content p, .body-text { color: ${textColor} !important; }` : '';
+          const styleBlock = `<style id="customization-override">:root { ${overrides} }${bodyOverrides}${colorOverrides}</style>`;
           filled = filled.replace('</head>', `${styleBlock}</head>`);
         }
         setHtml(filled);
@@ -53,7 +55,7 @@ const HTMLTemplatePreview = ({ documentType, templateId, cv, customization }) =>
         setHtml('');
       })
       .finally(() => setLoading(false));
-  }, [path, cv, customization?.headingColor, customization?.accentColor, customization?.backgroundColor, customization?.textColor]);
+  }, [path, cv, customization]);
 
   if (!path) return null;
   if (loading) return <Box sx={{ p: 3, textAlign: 'center' }}>Loading template…</Box>;

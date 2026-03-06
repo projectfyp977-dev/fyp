@@ -83,7 +83,7 @@ const Dashboard = () => {
       cvData.title = `${cv.title} (Copy)`;
       const response = await axios.post(`${getApiUrl()}/cv`, cvData);
       fetchCVs();
-      navigate(`/cv/${response.data.id || response.data._id}`);
+      navigate(`/cv/${response.data.id || response.data._id}`, { state: { documentType: cv.documentType } });
     } catch (error) {
       console.error('Error duplicating CV:', error);
       alert('Failed to duplicate CV');
@@ -411,7 +411,7 @@ const Dashboard = () => {
                         <Button
                           size="small"
                           startIcon={<EditIcon />}
-                          onClick={() => navigate(`/cv/${cvId}`)}
+                          onClick={() => navigate(`/cv/${cvId}`, { state: { documentType: cv.documentType } })}
                           variant="contained"
                           sx={{ flex: 1, borderRadius: 2, py: 1, fontWeight: 600 }}
                         >
@@ -479,7 +479,7 @@ const Dashboard = () => {
         open={Boolean(anchorEl)}
         onClose={handleCloseMenu}
       >
-        <MenuItem onClick={() => selectedCv && navigate(`/cv/${selectedCv.id || selectedCv._id}`)}>
+        <MenuItem onClick={() => selectedCv && navigate(`/cv/${selectedCv.id || selectedCv._id}`, { state: { documentType: selectedCv.documentType } })}>
           <EditIcon sx={{ mr: 2 }} fontSize="small" />
           Edit
         </MenuItem>

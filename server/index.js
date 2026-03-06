@@ -15,6 +15,9 @@ if (!fs.existsSync(uploadsDir)) {
 
 const app = express();
 
+// CORS - allow frontend (e.g. React on port 3000) to call this API
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true }));
+
 // Middleware - increase limit for base64 images (e.g. photo in CV)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -25,9 +28,22 @@ app.use('/api/cv', require('./routes/cv'));
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/ats', require('./routes/ats'));
 
-// Health check
+// Health check (tests DB so you can open http://localhost:5000/api/health to verify MySQL)
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  pool.getConnection()
+    .then(connection => {
+      connection.release();
+      res.json({ status: 'OK', message: 'Server is running', database: 'connected' });
+    })
+    .catch(err => {
+      res.status(503).json({
+        status: 'ERROR',
+        message: 'Server is running but MySQL is not reachable',
+        database: 'disconnected',
+        hint: 'Start MySQL in XAMPP and check server/.env (DB_HOST=localhost, DB_PASSWORD)',
+        error: err.message
+      });
+    });
 });
 
 // Test MySQL connection
@@ -35,9 +51,16 @@ pool.getConnection()
   .then(connection => {
     console.log('MySQL connected successfully');
     connection.release();
-    // Ensure cvs table has template and customization columns (for existing DBs)
-    return pool.execute("SHOW COLUMNS FROM cvs LIKE 'template'");
+    // Ensure cvs table has document_type, template, customization (for existing DBs)
+    return pool.execute("SHOW COLUMNS FROM cvs LIKE 'document_type'");
   })
+  .then(([dtCols]) => {
+    if (dtCols && dtCols.length === 0) {
+      return pool.execute("ALTER TABLE cvs ADD COLUMN document_type VARCHAR(50) DEFAULT 'cv' AFTER title")
+        .then(() => console.log('Added document_type column to cvs table'));
+    }
+  })
+  .then(() => pool.execute("SHOW COLUMNS FROM cvs LIKE 'template'"))
   .then(([cols]) => {
     if (cols && cols.length === 0) {
       return pool.execute("ALTER TABLE cvs ADD COLUMN template VARCHAR(255) DEFAULT 'ats-simple' AFTER title")

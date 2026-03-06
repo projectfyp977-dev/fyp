@@ -3,24 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Letterhead</title>
+  <title>Biographics</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { margin: 0; padding: 40px; background-color: #e8ded6; font-family: 'Georgia', serif; display: flex; justify-content: center; }
-    .page-container { width: 210mm; min-height: 297mm; background-color: #fff; position: relative; padding: 40px 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .page-container { width: 210mm; min-height: auto; background-color: #fff; position: relative; padding: 45px 50px 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; gap: 1.2rem; }
+    .shape-corner { position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; border: 4px solid #e8d4c4; border-radius: 50%; pointer-events: none; }
+    .shape-triangle { position: absolute; bottom: 2cm; left: -30px; width: 0; height: 0; border-left: 80px solid transparent; border-right: 80px solid transparent; border-bottom: 140px solid rgba(200,180,160,0.2); pointer-events: none; }
+    .shape-line { position: absolute; top: 50%; left: 0; width: 6px; height: 120px; background: linear-gradient(180deg, #c8b4a0, #e8d4c4); border-radius: 0 4px 4px 0; pointer-events: none; }
     .logo-text { font-size: 1.8rem; font-weight: bold; color: #222; margin-bottom: 5px; }
-    .logo-sub { font-size: 0.9rem; color: #222; margin-bottom: 20px; }
-    h2.headline { font-size: 1.5rem; color: #222; margin: 10px 0 30px 0; }
-    .body-text { font-size: 0.95rem; color: #444; line-height: 1.8; margin-bottom: 20px; }
-    .signature-area { margin-top: 50px; text-align: right; }
+    .logo-sub { font-size: 0.9rem; color: #555; margin-bottom: 20px; }
+    h2.headline { font-size: 1.5rem; color: #222; margin: 10px 0 20px 0; padding-bottom: 10px; border-bottom: 3px solid #c8b4a0; display: inline-block; }
+    .body-text { font-size: 0.95rem; color: #444; line-height: 1.8; flex: 1; min-height: 3cm; }
+    .signature-area { margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #eee; text-align: right; }
     .name { font-weight: 700; font-size: 1.1rem; color: #222; }
-    .role { font-size: 0.9rem; color: #444; }
+    .role { font-size: 0.9rem; color: #555; }
   </style>
 </head>
 <body>
   <div class="page-container">
+    <div class="shape-corner"></div>
+    <div class="shape-triangle"></div>
+    <div class="shape-line"></div>
     <div class="logo-text">{{company}}</div>
-    <div class="logo-sub">Platform</div>
+    <div class="logo-sub">{{platform}}</div>
     <h2 class="headline">{{title}}</h2>
     <div class="body-text">{{body}}</div>
     <div class="signature-area">

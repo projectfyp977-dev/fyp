@@ -172,7 +172,7 @@ const CVCustomization = ({ customization, onChange, documentType = 'cv' }) => {
         <AccordionDetails>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
-              <Typography gutterBottom>Heading Color</Typography>
+              <Typography gutterBottom>Heading / Accent Color</Typography>
               <input
                 type="color"
                 value={localCustomization.headingColor}
@@ -189,11 +189,23 @@ const CVCustomization = ({ customization, onChange, documentType = 'cv' }) => {
                 style={{ width: '100%', height: 40, borderRadius: 8, border: '1px solid #ddd' }}
               />
             </Grid>
+            {(documentType === 'visiting-card' || documentType === 'poster') && (
+            <Grid item xs={12} sm={6}>
+              <Typography gutterBottom>Background Color</Typography>
+              <input
+                type="color"
+                value={localCustomization.backgroundColor || (documentType === 'visiting-card' ? '#2563eb' : '#0d9488')}
+                onChange={(e) => updateCustomization('backgroundColor', e.target.value)}
+                style={{ width: '100%', height: 40, borderRadius: 8, border: '1px solid #ddd' }}
+              />
+            </Grid>
+            )}
           </Grid>
         </AccordionDetails>
       </Accordion>
 
-      {/* Layout */}
+      {/* Layout - only for CV */}
+      {documentType === 'cv' && (
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -232,6 +244,7 @@ const CVCustomization = ({ customization, onChange, documentType = 'cv' }) => {
           </Grid>
         </AccordionDetails>
       </Accordion>
+      )}
 
       {/* Section Control - only for CV */}
       {documentType === 'cv' && (
@@ -273,7 +286,8 @@ const CVCustomization = ({ customization, onChange, documentType = 'cv' }) => {
       </Accordion>
       )}
 
-      {/* Additional Customization Options */}
+      {/* Advanced Options - only for CV */}
+      {documentType === 'cv' && (
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -354,8 +368,10 @@ const CVCustomization = ({ customization, onChange, documentType = 'cv' }) => {
           </Grid>
         </AccordionDetails>
       </Accordion>
+      )}
 
-      {/* Text Alignment */}
+      {/* Text Alignment - only for CV */}
+      {documentType === 'cv' && (
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -419,6 +435,7 @@ const CVCustomization = ({ customization, onChange, documentType = 'cv' }) => {
           </Grid>
         </AccordionDetails>
       </Accordion>
+      )}
 
       <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
         <Button
@@ -433,6 +450,7 @@ const CVCustomization = ({ customization, onChange, documentType = 'cv' }) => {
               lineSpacing: 1.5,
               margins: 20,
               sections: localCustomization.sections,
+              ...(documentType === 'visiting-card' || documentType === 'poster' ? { backgroundColor: '' } : {}),
             };
             setLocalCustomization(reset);
             onChange(reset);

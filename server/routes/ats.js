@@ -3,10 +3,10 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// ATS Score Checker
+// ATS Score Checker - CV uses full analysis; visiting-card, poster, biographics use simplified checks
 router.post('/analyze', auth, async (req, res) => {
   try {
-    const { cvContent } = req.body;
+    const { cvContent, documentType = 'cv' } = req.body;
 
     if (!cvContent) {
       return res.status(400).json({ message: 'CV content is required' });
@@ -25,7 +25,63 @@ router.post('/analyze', auth, async (req, res) => {
 
     let totalScore = 0;
     let maxScore = 0;
+    const isSimpleDoc = ['visiting-card', 'poster', 'biographics'].includes(documentType);
 
+    if (isSimpleDoc) {
+      // Simplified ATS for visiting card, poster, biographics - only contact + content completeness
+      const p = cvContent.personalInfo || {};
+      const nameVal = (p.fullName || p.name || '').toString().trim();
+      const emailVal = (p.email || '').toString().trim();
+      const hasName = nameVal.length > 0;
+      const hasEmail = emailVal.length > 0;
+      const hasPhone = !!((p.phone || '').toString().trim());
+      const hasContent = !!(
+        (cvContent.professionalSummary || '').toString().trim() ||
+        (cvContent.title || '').toString().trim() ||
+        (p.company || '').toString().trim()
+      );
+
+      analysis.scores.contactInfo = (hasName ? 3 : 0) + (hasEmail ? 3 : 0) + (hasPhone ? 2 : 0) + (p.website ? 2 : 0);
+      analysis.scores.professionalSummary = hasContent ? 20 : 0;
+      totalScore = analysis.scores.contactInfo + analysis.scores.professionalSummary;
+      maxScore = 30;
+
+      if (!hasName || !hasEmail) {
+        analysis.issues.push({
+          section: 'Contact',
+          issue: 'Name and email are required',
+          priority: 'high',
+          suggestion: 'Add your full name and email for contact purposes.'
+        });
+      }
+      if (!hasContent) {
+        analysis.issues.push({
+          section: 'Content',
+          issue: 'Add title, tagline, or company name',
+          priority: 'medium',
+          suggestion: documentType === 'visiting-card' ? 'Add your tagline or company name.' : documentType === 'poster' ? 'Add poster title and main text.' : 'Add a biography or summary.'
+        });
+      }
+      analysis.overallScore = Math.round((totalScore / maxScore) * 100);
+      if (analysis.overallScore < 60) {
+        analysis.suggestions.push({ priority: 'medium', suggestion: 'Complete your contact info and add main content.' });
+      } else {
+        analysis.suggestions.push({ priority: 'low', suggestion: 'Looking good! Your content is complete.' });
+      }
+      // Clarity / grammar note for short content
+      const mainText = (cvContent.professionalSummary || cvContent.title || '').toString().trim();
+      if (mainText.length > 0 && mainText.length < 20) {
+        analysis.issues.push({
+          section: 'Content',
+          issue: 'Main text is very short',
+          priority: 'low',
+          suggestion: 'Add a bit more detail for clarity and impact.'
+        });
+      }
+      return res.json(analysis);
+    }
+
+    // Full CV ATS analysis below
     // 1. Professional Summary Check (20 points)
     maxScore += 20;
     if (cvContent.professionalSummary && cvContent.professionalSummary.length >= 50) {

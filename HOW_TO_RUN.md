@@ -140,15 +140,25 @@ npm run client
    - User: `root`
    - Password: (empty)
 
-### Port Already in Use
+### Port Already in Use (EADDRINUSE on 5000)
 
-**Problem:** `Port 5000 is already in use` or `Port 3000 is already in use`
+**Problem:** `Error: listen EADDRINUSE: address already in use 0.0.0.0:5000`
 
 **Solutions:**
-1. Stop other applications using these ports
-2. Or change the port in:
-   - Backend: `server/.env` → `PORT=5001` (or another port)
-   - Frontend: `client/.env` → `PORT=3001` (or another port)
+
+1. **Free port 5000 (Windows):**  
+   In PowerShell, from the `server` folder run:
+   ```powershell
+   .\kill-port-5000.ps1
+   ```
+   Then start the server again: `npm run server`.
+
+2. **Use a different port:**  
+   - In `server/.env` set `PORT=5001`.  
+   - In `client/.env` set `REACT_APP_API_URL=http://localhost:5001/api`.  
+   Then start backend and frontend as usual.
+
+3. Close any other terminal/tab where you might have run the server before (another Node process may still be using 5000).
 
 ### Database Not Found
 
@@ -178,12 +188,28 @@ cd client && npm install && cd ..
 
 ### Frontend Can't Connect to Backend
 
-**Problem:** API calls failing, CORS errors
+**Problem:** "Server not reachable at http://localhost:5000/api" or API calls failing.
 
-**Solutions:**
-1. Make sure backend is running on port 5000
-2. Check `client/.env` has correct API URL
-3. Verify backend CORS is enabled (should be by default)
+**Cause:** The backend is not running. The frontend needs the backend on port 5000 for login, register, save, etc.
+
+**Solution – run backend first, then frontend:**
+
+**Option A – Two terminals (recommended):**
+
+1. **Terminal 1 – Backend:**  
+   `cd server` then `npm start`  
+   Wait for: "Server is running on port 5000". Leave this open.
+
+2. **Terminal 2 – Frontend:**  
+   `cd client` then `npm start`  
+   Open http://localhost:3000
+
+**Option B – From root:**  
+Run `npm run dev` from project root. If only the client starts, use Option A and run the server in a separate terminal.
+
+**Also check:** XAMPP MySQL is running; test backend: open http://localhost:5000/api/health (should show `{"status":"OK"}`).
+
+If the browser shows **"blocked by CORS policy"**: the backend now sends CORS headers. Fix the "Server not reachable" / EADDRINUSE issue above so the backend actually starts; then CORS will work.
 
 ## Project Structure
 

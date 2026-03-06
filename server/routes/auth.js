@@ -96,8 +96,11 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR' || error.code === 'PROTOCOL_CONNECTION_LOST') {
-      return res.status(503).json({ message: 'Database connection failed. Please start MySQL (e.g. XAMPP).' });
+    if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR' || error.code === 'PROTOCOL_CONNECTION_LOST' || error.code === 'ENOTFOUND') {
+      return res.status(503).json({ message: 'Database connection failed. Please start MySQL (e.g. XAMPP) and check server/.env (DB_HOST=localhost, DB_PASSWORD match XAMPP).' });
+    }
+    if (error.code === 'ER_BAD_DB_ERROR') {
+      return res.status(503).json({ message: 'Database "voice_cv_maker" not found. Run: cd server && node database/setup.js' });
     }
     res.status(500).json({ message: error.message || 'Server error' });
   }

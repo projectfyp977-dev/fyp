@@ -40,7 +40,10 @@ router.post('/', auth, async (req, res) => {
     res.status(201).json(cv);
   } catch (error) {
     console.error('Create CV error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({
+      message: error.message || 'Server error',
+      code: error.code,
+    });
   }
 });
 
@@ -54,7 +57,10 @@ router.put('/:id', auth, async (req, res) => {
     res.json(cv);
   } catch (error) {
     console.error('Update CV error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({
+      message: error.message || 'Server error',
+      code: error.code,
+    });
   }
 });
 

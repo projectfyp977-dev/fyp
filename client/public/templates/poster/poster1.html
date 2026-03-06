@@ -7,7 +7,8 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background-color: #a67352; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
-    .poster { width: 21cm; height: 29.7cm; background: linear-gradient(135deg, #e0b492 0%, #d1a180 100%); position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; padding: 3cm 2.5cm; display: flex; flex-direction: column; align-items: center; justify-content: space-between; color: white; text-align: center; }
+    :root { --poster-bg: linear-gradient(135deg, #e0b492 0%, #d1a180 100%); --accent: #f5e6cc; }
+    .poster { width: 21cm; height: 29.7cm; background: var(--poster-bg, linear-gradient(135deg, #e0b492 0%, #d1a180 100%)); position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; padding: 3cm 2.5cm; display: flex; flex-direction: column; align-items: center; justify-content: space-between; color: white; text-align: center; }
     .logo { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5cm; color: #fff; opacity: 0.9; }
     .title { font-size: 3.5rem; line-height: 1.1; font-weight: 800; text-transform: uppercase; margin-bottom: 1cm; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
     .title span { color: #f5e6cc; display: block; }

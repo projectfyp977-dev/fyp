@@ -114,7 +114,11 @@ const CVEditor = () => {
       linkedIn: '',
       website: '',
       github: '',
-      photo: ''
+      photo: '',
+      logo: '',
+      platform: '',
+      posterSubtitle: '',
+      posterHeadline: ''
     },
     professionalSummary: '',
     workExperience: [],
@@ -229,9 +233,9 @@ const CVEditor = () => {
         await axios.put(`${getApiUrl()}/cv/${id}`, cvToSave, config);
       } else {
         const response = await axios.post(`${getApiUrl()}/cv`, cvToSave, config);
-        // MySQL returns 'id', not '_id'
+        // MySQL returns 'id', not '_id' - pass documentType so editor shows correct fields immediately
         const cvId = response.data.id || response.data._id;
-        navigate(`/cv/${cvId}`);
+        navigate(`/cv/${cvId}`, { state: { documentType } });
       }
       alert('CV saved successfully!');
     } catch (error) {
@@ -535,6 +539,39 @@ const CVEditor = () => {
                         />
                       </Grid>
                     )}
+                    {documentType === 'visiting-card' && showField('logo') && (
+                    <Grid item xs={12}>
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="subtitle2" gutterBottom>
+                          Logo (Company/Brand)
+                        </Typography>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => updateField('personalInfo.logo', reader.result);
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                          style={{ display: 'none' }}
+                          id="logo-upload"
+                        />
+                        <label htmlFor="logo-upload">
+                          <Button variant="outlined" component="span" fullWidth>
+                            {cv.personalInfo.logo ? 'Change Logo' : 'Upload Logo'}
+                          </Button>
+                        </label>
+                        {cv.personalInfo.logo && (
+                          <Box sx={{ mt: 2, textAlign: 'center' }}>
+                            <img src={cv.personalInfo.logo} alt="Logo" style={{ maxWidth: 120, maxHeight: 80, objectFit: 'contain' }} />
+                          </Box>
+                        )}
+                      </Box>
+                    </Grid>
+                    )}
                     {(documentType === 'cv' || showField('photo')) && (
                     <Grid item xs={12}>
                       <Box sx={{ mt: 2 }}>
@@ -593,13 +630,54 @@ const CVEditor = () => {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
+                  {documentType === 'poster' && showField('subtitle') && (
+                    <Box sx={{ mb: 2 }}>
+                      <VoiceInput
+                        label="Subtitle (short line)"
+                        value={cv.personalInfo.posterSubtitle || ''}
+                        onChange={(value) => updateField('personalInfo.posterSubtitle', value)}
+                        placeholder="e.g. Event tagline"
+                      />
+                    </Box>
+                  )}
+                  {documentType === 'poster' && showField('headline') && (
+                    <Box sx={{ mb: 2 }}>
+                      <VoiceInput
+                        label="Headline"
+                        value={cv.personalInfo.posterHeadline || ''}
+                        onChange={(value) => updateField('personalInfo.posterHeadline', value)}
+                        placeholder="e.g. Main heading"
+                      />
+                    </Box>
+                  )}
                   <VoiceInput
-                    label={documentType === 'visiting-card' ? 'Tagline' : documentType === 'poster' ? 'Main text' : 'Summary'}
+                    label={documentType === 'visiting-card' ? 'Tagline' : documentType === 'poster' ? 'Main text (paragraph)' : 'Summary'}
                     value={cv.professionalSummary}
                     onChange={(value) => updateField('professionalSummary', value)}
                     multiline
                     rows={documentType === 'visiting-card' ? 2 : 4}
                   />
+                </AccordionDetails>
+              </Accordion>
+              )}
+              {documentType === 'biographics' && (showField('company') || showField('platform')) && (
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6">Company & Platform</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={2}>
+                    {showField('company') && (
+                      <Grid item xs={12}>
+                        <VoiceInput label="Company / Organization" value={cv.personalInfo.company || ''} onChange={(value) => updateField('personalInfo.company', value)} />
+                      </Grid>
+                    )}
+                    {showField('platform') && (
+                      <Grid item xs={12}>
+                        <VoiceInput label="Platform" value={cv.personalInfo.platform || ''} onChange={(value) => updateField('personalInfo.platform', value)} placeholder="e.g. YouTube, LinkedIn" />
+                      </Grid>
+                    )}
+                  </Grid>
                 </AccordionDetails>
               </Accordion>
               )}
@@ -1223,7 +1301,7 @@ const CVEditor = () => {
           <Grid item xs={12} md={4}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <CVCustomization customization={customization} onChange={setCustomization} documentType={documentType} />
-              <ATSScoreChecker cvContent={cv} documentType={documentType} />
+              {documentType === 'cv' && <ATSScoreChecker cvContent={cv} documentType={documentType} />}
             </Box>
           </Grid>
         </Grid>

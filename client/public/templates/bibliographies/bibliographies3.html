@@ -3,31 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Letterhead</title>
+  <title>Biographics</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #e0e0e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; font-family: 'Arial', sans-serif; }
-    .letterhead { width: 21cm; height: 29.7cm; background: white; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; padding: 3cm 2cm 2cm; color: #333; }
-    .header-text { font-size: 1.6rem; font-weight: bold; line-height: 1; }
-    .header-text span { display: block; font-size: 1rem; color: #00bfa5; }
-    .headline { font-size: 1.4rem; font-weight: bold; margin-bottom: 1cm; }
-    .body-text { font-size: 0.85rem; line-height: 1.6; color: #555; margin-bottom: 2cm; }
-    .bottom-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 3cm; background: #00bfa5; color: white; display: flex; align-items: center; padding: 0 2cm; justify-content: space-between; }
-    .signature-name { font-size: 1rem; font-weight: bold; }
-    .signature-title { font-size: 0.8rem; color: #ccc; }
+    body { background: linear-gradient(135deg, #e0f2f1 0%, #f5f5f5 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; font-family: 'Segoe UI', system-ui, sans-serif; }
+    .letterhead { width: 21cm; min-height: auto; background: #fff; position: relative; box-shadow: 0 20px 60px -15px rgba(0,0,0,0.12); overflow: hidden; padding: 3cm 2.5cm 4cm; color: #333; display: flex; flex-direction: column; gap: 1.25cm; }
+    .shape-blob { position: absolute; top: -80px; right: 10%; width: 280px; height: 280px; background: radial-gradient(circle, rgba(0,191,165,0.15) 0%, transparent 65%); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; pointer-events: none; }
+    .shape-ring { position: absolute; bottom: 2.5cm; left: 1.5cm; width: 120px; height: 120px; border: 3px solid rgba(0,191,165,0.2); border-radius: 50%; pointer-events: none; }
+    .shape-ring-2 { position: absolute; bottom: 4cm; left: 3cm; width: 60px; height: 60px; border: 2px solid rgba(0,191,165,0.15); border-radius: 50%; pointer-events: none; }
+    .shape-square { position: absolute; top: 35%; right: 1.2cm; width: 70px; height: 70px; background: rgba(0,191,165,0.06); transform: rotate(12deg); border-radius: 12px; pointer-events: none; }
+    .shape-hex { position: absolute; top: 1.5cm; right: 3cm; width: 50px; height: 50px; background: rgba(0,191,165,0.08); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); pointer-events: none; }
+    .shape-line-v { position: absolute; top: 0; left: 1.8cm; width: 4px; height: 140px; background: linear-gradient(180deg, #00bfa5, transparent); border-radius: 0 0 4px 4px; pointer-events: none; }
+    .shape-dots { position: absolute; bottom: 1.5cm; right: 2cm; display: flex; gap: 8px; pointer-events: none; }
+    .shape-dots span { width: 8px; height: 8px; background: rgba(0,191,165,0.35); border-radius: 50%; }
+    .header-text { font-size: 1.65rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; }
+    .header-text span { display: block; font-size: 0.95rem; color: #00bfa5; font-weight: 600; margin-top: 4px; letter-spacing: 0.05em; }
+    .headline { font-size: 1.35rem; font-weight: 700; margin-bottom: 0.4cm; color: #0f172a; padding-bottom: 8px; border-bottom: 3px solid #00bfa5; display: inline-block; }
+    .body-text { font-size: 0.92rem; line-height: 1.8; color: #475569; flex: 1; min-height: 4cm; }
+    .bottom-bar { margin-top: auto; padding: 1.1cm 2cm; background: linear-gradient(135deg, #00bfa5 0%, #00897b 100%); color: white; display: flex; align-items: center; justify-content: flex-end; gap: 2rem; border-radius: 12px 12px 0 0; box-shadow: 0 -4px 20px rgba(0,191,165,0.2); }
+    .signature-name { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em; }
+    .signature-title { font-size: 0.88rem; color: rgba(255,255,255,0.9); font-weight: 500; }
   </style>
 </head>
 <body>
   <div class="letterhead">
-    <div class="header-text">{{company}}<br><span>Platform</span></div>
+    <div class="shape-blob"></div>
+    <div class="shape-ring"></div>
+    <div class="shape-ring-2"></div>
+    <div class="shape-square"></div>
+    <div class="shape-hex"></div>
+    <div class="shape-line-v"></div>
+    <div class="shape-dots"><span></span><span></span><span></span></div>
+    <div class="header-text">{{company}}<br><span>{{platform}}</span></div>
     <div class="headline">{{title}}</div>
     <div class="body-text">{{body}}</div>
     <div class="bottom-bar">
-      <div></div>
-      <div style="text-align:right;">
-        <div class="signature-name">{{fullName}}</div>
-        <div class="signature-title">{{jobTitle}}</div>
-      </div>
+      <div class="signature-name">{{fullName}}</div>
+      <div class="signature-title">{{jobTitle}}</div>
     </div>
   </div>
 </body>

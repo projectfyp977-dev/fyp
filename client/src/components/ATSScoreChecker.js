@@ -49,7 +49,7 @@ const ATSScoreChecker = ({ cvContent, documentType = 'cv' }) => {
       const token = localStorage.getItem('token');
       const response = await axios.post(
         `${getApiUrl()}/ats/analyze`,
-        { cvContent: cvContent },
+        { cvContent: cvContent, documentType },
         {
           headers: {
             'Authorization': `Bearer ${token}`,

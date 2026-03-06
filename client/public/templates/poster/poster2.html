@@ -6,30 +6,43 @@
   <title>Poster</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background-color: #faf6e9; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Georgia', serif; padding: 20px; }
-    .poster { width: 21cm; height: 29.7cm; background: #0d4a4a; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; color: #fff; display: flex; flex-direction: column; }
-    .content-wrapper { padding: 2cm 2cm 0; flex-grow: 1; display: flex; justify-content: space-between; align-items: flex-start; }
-    .text-column { max-width: 60%; }
-    .brand-name { font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 0.5cm; font-weight: bold; }
-    .headline { font-size: 2.3rem; line-height: 1.1; font-weight: 300; margin-bottom: 0.5cm; }
-    .subhead { font-size: 0.85rem; line-height: 1.4; color: #ccc; margin-bottom: 1cm; font-weight: 300; }
-    .website { font-size: 0.8rem; color: #ddd; margin-bottom: 1cm; }
-    .image-section { width: 100%; margin-top: 1cm; overflow: hidden; border-top: 1px solid #faf6e9; }
-    .image-section img { width: 100%; height: auto; display: block; object-fit: cover; }
+    body { background: #1e293b; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Segoe UI', system-ui, sans-serif; padding: 20px; }
+    :root { --dark: #0f172a; --accent: #38bdf8; --poster-bg: #0f172a; }
+    .poster { width: 21cm; min-height: 29.7cm; background: linear-gradient(165deg, #0f172a 0%, #1e293b 45%, #0f172a 100%); position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); overflow: hidden; color: #fff; display: flex; flex-direction: column; }
+    .shape-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; }
+    .shape-bg .circle { position: absolute; border-radius: 50%; border: 1px solid rgba(56,189,248,0.12); }
+    .shape-bg .c1 { top: -15%; right: -10%; width: 50%; height: 50%; }
+    .shape-bg .c2 { bottom: -20%; left: -15%; width: 45%; height: 45%; }
+    .shape-bg .strip { position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: linear-gradient(180deg, var(--accent, #38bdf8), transparent 60%); opacity: 0.8; }
+    .shape-bg .angle { position: absolute; bottom: 0; right: 0; width: 0; height: 0; border-left: 200px solid transparent; border-bottom: 200px solid rgba(56,189,248,0.06); }
+    .content-wrapper { position: relative; z-index: 1; padding: 2.5cm 2.5cm 1.5cm; flex: 1; display: flex; flex-direction: column; gap: 1.2cm; }
+    .brand-name { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent, #38bdf8); margin-bottom: 0.2cm; opacity: 0.95; }
+    .headline { font-size: 2.6rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; color: #fff; max-width: 85%; }
+    .subhead { font-size: 1rem; line-height: 1.5; color: rgba(255,255,255,0.75); font-weight: 400; max-width: 75%; }
+    .website { font-size: 0.9rem; color: rgba(255,255,255,0.6); font-weight: 500; margin-top: 0.3cm; }
+    .image-section { position: relative; z-index: 1; margin-top: auto; padding: 0 2.5cm 2cm; }
+    .image-frame { width: 100%; border-radius: 16px; overflow: hidden; border: 2px solid rgba(56,189,248,0.2); box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5); }
+    .image-frame img { width: 100%; height: auto; min-height: 200px; max-height: 14cm; display: block; object-fit: cover; }
   </style>
 </head>
 <body>
   <div class="poster">
+    <div class="shape-bg">
+      <div class="circle c1"></div>
+      <div class="circle c2"></div>
+      <div class="strip"></div>
+      <div class="angle"></div>
+    </div>
     <div class="content-wrapper">
-      <div class="text-column">
-        <div class="brand-name">{{company}}</div>
-        <h1 class="headline">{{headline}}</h1>
-        <p class="subhead">{{subhead}}</p>
-        <div class="website">{{website}}</div>
-      </div>
+      <div class="brand-name">{{company}}</div>
+      <h1 class="headline">{{headline}}</h1>
+      <p class="subhead">{{subhead}}</p>
+      <div class="website">{{website}}</div>
     </div>
     <div class="image-section">
-      <img src="{{photo}}" alt="" onerror="this.style.display='none'"/>
+      <div class="image-frame">
+        <img src="{{photo}}" alt="" onerror="this.style.display='none'; this.parentElement.style.minHeight='120px';"/>
+      </div>
     </div>
   </div>
 </body>

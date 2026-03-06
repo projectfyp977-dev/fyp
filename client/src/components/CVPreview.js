@@ -14,8 +14,9 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ImageIcon from '@mui/icons-material/Image';
 import DescriptionIcon from '@mui/icons-material/Description';
-import { exportCVToPDF } from '../utils/pdfExport';
+import { exportCVToPDF, exportToImage } from '../utils/pdfExport';
 import { exportCVToDOCX } from '../utils/docxExport';
 import { getTemplatePath } from '../config/templates';
 import HTMLTemplatePreview from './HTMLTemplatePreview';
@@ -38,7 +39,8 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
   if (!cv) return null;
 
   const currentTemplate = cv.template || template;
-  const currentCustomization = cv.customization || customization || {};
+  // Merge: live customization (from editor) overrides saved cv.customization so preview reflects current edits
+  const currentCustomization = { ...(cv.customization || {}), ...(customization || {}) };
   const documentType = cv.documentType || 'cv';
 
   const renderTemplate = () => {
@@ -91,6 +93,18 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
     }
   };
 
+  const handleExportImage = async () => {
+    const cvElement = document.getElementById('cv-preview-content');
+    if (cvElement) {
+      const result = await exportToImage(cvElement, cv?.title || 'Export');
+      if (result.success) {
+        alert('Image downloaded successfully!');
+      } else {
+        alert('Failed to export image: ' + result.error);
+      }
+    }
+  };
+
   const handleExportDOCX = async () => {
     const result = await exportCVToDOCX(cv, cv?.title || 'CV');
     if (result.success) {
@@ -114,6 +128,7 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
           {documentType === 'cv' ? 'CV' : documentType === 'visiting-card' ? 'Visiting Card' : documentType === 'poster' ? 'Poster' : 'Biographics'} Preview
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          {documentType !== 'poster' && (
           <Button
             variant="outlined"
             startIcon={<PictureAsPdfIcon />}
@@ -122,6 +137,17 @@ const CVPreview = ({ cv, open, onClose, template = 'modern', customization }) =>
           >
             PDF
           </Button>
+          )}
+          {(documentType === 'visiting-card' || documentType === 'poster') && (
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handleExportImage}
+            startIcon={<ImageIcon />}
+          >
+            {documentType === 'poster' ? 'Download as Image' : 'Download Image'}
+          </Button>
+          )}
           {documentType === 'cv' && (
           <Button
             variant="outlined"

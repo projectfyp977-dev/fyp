@@ -6,6 +6,7 @@ class CV {
     const {
       userId,
       title = 'My CV',
+      documentType = 'cv',
       personalInfo,
       professionalSummary = '',
       workExperience = [],
@@ -20,12 +21,13 @@ class CV {
 
     const [result] = await pool.execute(
       `INSERT INTO cvs 
-       (userId, title, template, customization, personalInfo, professionalSummary, workExperience, 
+       (userId, title, document_type, template, customization, personalInfo, professionalSummary, workExperience, 
         education, skills, certifications, languages, projects) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId,
         title,
+        documentType || 'cv',
         template || 'ats-simple',
         customization ? JSON.stringify(customization) : null,
         JSON.stringify(personalInfo || {}),
@@ -84,6 +86,7 @@ class CV {
   static async update(id, userId, updateData) {
     const {
       title,
+      documentType,
       personalInfo,
       professionalSummary,
       workExperience,
@@ -102,6 +105,10 @@ class CV {
     if (title !== undefined) {
       updates.push('title = ?');
       values.push(title);
+    }
+    if (documentType !== undefined) {
+      updates.push('document_type = ?');
+      values.push(documentType);
     }
     if (template !== undefined) {
       updates.push('template = ?');
